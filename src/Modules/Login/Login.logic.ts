@@ -1,11 +1,10 @@
-import { useContext, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { AuthContext } from '../../Context/Authcontext';
+import { useState } from 'react';
 type Inputs = {
   institutionalCode: string;
   password: string;
 };
-const { login } = useContext(AuthContext);
+
 const Login = () => {
   const [isLoggin, setIsLoggin] = useState(false);
 
