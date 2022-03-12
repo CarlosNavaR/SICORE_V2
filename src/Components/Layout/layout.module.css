@@ -1,0 +1,18 @@
+.gridLayout {
+  display: grid;
+  grid-template-rows: auto;
+  grid-template-columns: 0.2fr 1fr;
+  grid-template-areas: 'sidebar main';
+}
+
+.noGridLayout {
+  width: 100%;
+}
+
+.sidebar {
+  grid-area: sidebar;
+}
+
+.main {
+  grid-area: main;
+}

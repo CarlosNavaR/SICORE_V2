@@ -1,10 +1,10 @@
 import { RowDataPacket } from 'mysql2';
 import { db } from './database';
 import { SystemUserModel } from '../models/SystemUserModel';
-
+import { AuthModel } from '_/models/authModel';
 const connection = db.dbConnection();
 
-export const login = async (data: any): Promise<boolean> => {
+export const login = async (data: any) => {
   try {
     const { institutionalCode, password } = data;
     const result = false;
@@ -17,7 +17,7 @@ export const login = async (data: any): Promise<boolean> => {
 
     //@ts-ignore
     if (rows.length > 0) {
-      return true;
+      return rows;
     } else return false;
   } catch (error) {
     console.log(error);

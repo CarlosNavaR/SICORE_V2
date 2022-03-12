@@ -1,10 +1,5 @@
 import ReactDOM from 'react-dom';
 import { App } from './App';
-import { HashRouter } from 'react-router-dom';
+import 'react-toastify/dist/ReactToastify.css';
 
-ReactDOM.render(
-  <HashRouter>
-    <App />
-  </HashRouter>,
-  document.getElementById('root')
-);
+ReactDOM.render(<App />, document.getElementById('root'));

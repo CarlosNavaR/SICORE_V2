@@ -20,6 +20,7 @@ function createWindow() {
     height: 600,
     width: 800,
     webPreferences: {
+      worldSafeExecuteJavaScript: true,
       contextIsolation: true,
       nodeIntegration: false,
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
@@ -50,6 +51,6 @@ app.on('activate', () => {
 
 ipcMain.handle('VALIDATE_LOGIN', async (event, data) => {
   const result = await login(data);
-  console.log(result);
+
   return result;
 });

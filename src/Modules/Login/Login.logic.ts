@@ -1,12 +1,16 @@
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { Navigate } from 'react-router-dom';
+import { AuthContext } from '../../Context/Authcontext';
+import { toast } from 'react-toastify';
 type Inputs = {
   institutionalCode: string;
   password: string;
 };
 
 const Login = () => {
-  const [isLoggin, setIsLoggin] = useState(false);
+  const { login, isLogin } = useContext(AuthContext);
+  const [isLogging, setIsLogging] = useState(false);
 
   const {
     register,
@@ -16,14 +20,19 @@ const Login = () => {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      const result = await window.Main.validateLogin(data);
-      if (result) setIsLoggin(true);
+      await login(data).then((response) => {
+        if (response === undefined) {
+          setIsLogging(isLogin);
+        } else {
+          toast.error('Usuario o contraseña incorrectas');
+        }
+      });
     } catch (err) {
       console.log(err);
     }
   };
 
-  return { register, handleSubmit, onSubmit, isLoggin };
+  return { register, handleSubmit, onSubmit, isLogging };
 };
 
 export default Login;
