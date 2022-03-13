@@ -15,6 +15,7 @@ const Layout = () => {
   return (
     <div className={isLogin ? styles.gridLayout : styles.noGridLayout}>
       {isLogin && <Sidebar />}
+
       <main className={styles.main}>
         <Outlet />
       </main>

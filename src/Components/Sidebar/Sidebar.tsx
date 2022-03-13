@@ -5,7 +5,10 @@ const Sidebar = () => {
   const { logout } = useContext(AuthContext);
 
   return (
-    <div className="d-flex flex-column flex-shrink-1 p-3 shadow-sm rounded">
+    <div
+      className="d-flex flex-column flex-shrink-1 p-3 shadow-sm rounded w-100"
+      style={{ height: '100vh' }}
+    >
       <a
         href="#"
         className="d-flex align-items-center mb-3 mb-md-0 me-md-auto  text-decoration-none"
@@ -15,7 +18,13 @@ const Sidebar = () => {
       <hr />
       <ul className="nav nav-pills flex-column mb-5">
         <li className="nav-item">
-          <Link to="loans" className="nav-link active" aria-current="page">
+          <Link
+            to="loans"
+            className={`nav-link  ${
+              location.hash === '#/home' ? 'active' : 'text-dark'
+            }`}
+            aria-current="page"
+          >
             <i className="fa-solid fa-folder-plus  me-2"></i>
             Prestamos
           </Link>
@@ -33,7 +42,12 @@ const Sidebar = () => {
           </Link>
         </li>
         <li>
-          <Link to="users" className="nav-link text-dark">
+          <Link
+            to="users"
+            className={`nav-link  ${
+              location.hash === '#/users' ? 'active' : 'text-dark'
+            }`}
+          >
             <i className="fa-solid fa-users me-2"></i>
             Usuarios
           </Link>

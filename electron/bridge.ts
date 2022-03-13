@@ -13,6 +13,11 @@ export const api = {
     const result = await ipcRenderer.invoke('VALIDATE_LOGIN', data);
     return result;
   },
+
+  getAllUsers: () => {
+    const users = ipcRenderer.invoke('Get_all_users');
+    return users;
+  },
   /**
    * Provide an easier way to listen to events
    */

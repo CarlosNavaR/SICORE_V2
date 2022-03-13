@@ -3,6 +3,7 @@ import React, { useState, useContext } from 'react';
 import { Navigate } from 'react-router-dom';
 import { AuthContext } from '../../Context/Authcontext';
 import { toast } from 'react-toastify';
+
 type Inputs = {
   institutionalCode: string;
   password: string;
