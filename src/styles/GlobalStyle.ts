@@ -21,7 +21,7 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-family: Roboto, sans-serif;
     margin: auto;
     background-color: var(--background);
     

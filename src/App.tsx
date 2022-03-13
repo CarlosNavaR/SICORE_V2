@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle';
 import '@fortawesome/fontawesome-free/js/all';
+import './styles/Fonts';
 import React, { useContext } from 'react';
 import { Routes, Route, HashRouter } from 'react-router-dom';
 import { GlobalStyle } from './styles/GlobalStyle';

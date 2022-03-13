@@ -20,7 +20,6 @@ const AuthProvider = ({ children }: Props) => {
   const location = useLocation();
   const [isLogin, setIsLogin] = useState<boolean>(false);
   const [auth, setAuth] = useState<AuthModel | null>(null);
-
   useEffect(() => {}, [isLogin]);
 
   const login = async (data: any) => {
@@ -39,6 +38,7 @@ const AuthProvider = ({ children }: Props) => {
         InstitucionalCode: response[0].InstitutionalCode,
         IdRole: response[0].IdSystemUserRole,
       };
+      setAuth(authData);
       // Store auth
       const authStr = JSON.stringify(authData);
       await localStorage.setItem('auth', authStr);
