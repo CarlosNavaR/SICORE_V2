@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { userModel } from '../../models/userModel';
-
 interface Column {
   id:
     | 'Id'
@@ -16,6 +16,14 @@ interface Column {
   align?: 'right';
   format?: (value: number) => string;
 }
+type NewUserInputs = {
+  InstitutionalCode: string;
+  FirstName: string;
+  FatherLastname: string;
+  MotherLastname: string;
+  InstitutionalEmail: string;
+  IdUserRole: string;
+};
 
 const columns: readonly Column[] = [
   {
@@ -39,6 +47,11 @@ const Users = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [IsLoading, setIsLoading] = useState(true);
   const [searched, setSearched] = useState<string>('');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<NewUserInputs>();
 
   const requestSearch = (searchedVal: string) => {
     setSearched(searchedVal);
@@ -93,16 +106,43 @@ const Users = () => {
     setPage(0);
   };
 
+  const handleDeleteUser = (data: any) => {
+    console.log(data);
+  };
+
+  const handleUpdateUser = (data: any) => {
+    console.log(data);
+  };
+
+  const onSubmit: SubmitHandler<NewUserInputs> = async (data) => {
+    console.log(
+      '🚀 ~ file: Users.logic.ts ~ line 118 ~ constonSubmit:SubmitHandler<NewUserInputs>= ~ data',
+      data
+    );
+  };
+  const handleNewUser = (data: any) => {
+    console.log(
+      '🚀 ~ file: Users.logic.ts ~ line 104 ~ handleNewUser ~ data',
+      data
+    );
+  };
+
   return {
     page,
     rowsPerPage,
     columns,
     rows,
+    register,
     searched,
+    handleSubmit,
+    onSubmit,
     handleChangePage,
     handleChangeRowsPerPage,
     requestSearch,
     cancelSearch,
+    handleDeleteUser,
+    handleUpdateUser,
+    handleNewUser,
   };
 };
 

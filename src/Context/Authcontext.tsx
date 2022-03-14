@@ -9,6 +9,12 @@ type AuthContextType = {
   logout: () => void;
 };
 
+type LocationProps = {
+  state: {
+    from: Location;
+  };
+};
+
 type Props = {
   children: ReactNode;
 };
@@ -17,7 +23,7 @@ export const AuthContext = createContext({} as AuthContextType);
 
 const AuthProvider = ({ children }: Props) => {
   const navigate = useNavigate();
-  const location = useLocation();
+  const location = useLocation() as unknown as LocationProps;
   const [isLogin, setIsLogin] = useState<boolean>(false);
   const [auth, setAuth] = useState<AuthModel | null>(null);
   useEffect(() => {}, [isLogin]);
