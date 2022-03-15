@@ -3,22 +3,21 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import { toast } from 'react-toastify';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import userLogic from '../Users.logic';
-
 type NewUserInputs = {
   InstitutionalCode: string;
   FirstName: string;
   FatherLastname: string;
   MotherLastname: string;
-  InstitutionalEmail: string;
+  Password: string;
   IdUserRole: string;
 };
 
 type Props = {
   handleClose: () => void;
+  getAllSystemUser: () => void;
 };
 
-const NewUserForm = ({ handleClose }: Props) => {
+const NewSystemUserForm = ({ handleClose, getAllSystemUser }: Props) => {
   const {
     register,
     handleSubmit,
@@ -26,7 +25,7 @@ const NewUserForm = ({ handleClose }: Props) => {
   } = useForm<NewUserInputs>();
 
   const onSubmit: SubmitHandler<NewUserInputs> = async (data) => {
-    await window.Main.newUser(data).then((response) => {
+    await window.Main.newSystemUser(data).then((response) => {
       console.log(
         '🚀 ~ file: newUserForm.tsx ~ line 30 ~ awaitwindow.Main.newUser ~ response',
         response
@@ -35,6 +34,7 @@ const NewUserForm = ({ handleClose }: Props) => {
         toast.warning('Usuario ya registrado');
       } else if (response === 2) {
         toast.success('Usuario registrado con éxito');
+        getAllSystemUser();
         handleClose();
       } else {
         toast.error('Error al registrar usuario');
@@ -111,12 +111,12 @@ const NewUserForm = ({ handleClose }: Props) => {
 
           <Grid item xs={12}>
             <div className="form-outline ">
-              <label className="form-label">Correo institucional</label>
+              <label className="form-label">Contraseña</label>
               <input
-                type="email"
-                id="InstitutionalEmail"
+                type="password"
+                id="Password"
                 className="form-control form-control"
-                {...register('InstitutionalEmail', {
+                {...register('Password', {
                   required: true,
                 })}
               />
@@ -137,8 +137,8 @@ const NewUserForm = ({ handleClose }: Props) => {
                 <option value="DEFAULT" disabled>
                   Selecciona un rol
                 </option>
-                <option value="1">Profesor</option>
-                <option value="2">Alumno</option>
+                <option value="1">Administrador</option>
+                <option value="2">Operador</option>
               </select>
             </div>
           </Grid>
@@ -154,4 +154,4 @@ const NewUserForm = ({ handleClose }: Props) => {
   );
 };
 
-export default NewUserForm;
+export default NewSystemUserForm;

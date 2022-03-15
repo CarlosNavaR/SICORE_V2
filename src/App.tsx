@@ -8,6 +8,7 @@ import { GlobalStyle } from './styles/GlobalStyle';
 import { ToastContainer } from 'react-toastify';
 import Login from './Modules/Login/Login';
 import Users from './Modules/Users/Users';
+import SystemUsers from './Modules/SystemUsers/systemUsers';
 import Home from './Modules/Home/home';
 import AuthProvider from './Context/Authcontext';
 import PrivateRoute from './Routes/PrivateRoute';
@@ -40,10 +41,10 @@ export function App() {
                 }
               />
               <Route
-                path="/Users"
+                path="/SystemUsers"
                 element={
                   <PrivateRoute>
-                    <Home />
+                    <SystemUsers />
                   </PrivateRoute>
                 }
               />

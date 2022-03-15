@@ -6,7 +6,6 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Logic from './Users.logic';
 import { styled } from '@mui/system';
 import TablePaginationUnstyled from '@mui/base/TablePaginationUnstyled';
 import TextField from '@mui/material/TextField';
@@ -14,11 +13,12 @@ import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
-import { toast } from 'react-toastify';
 import Grid from '@mui/material/Grid';
-import NewUserForm from './Forms/newUserForm';
-import Styles from './user.module.css';
-import { userModel } from '../../models/userModel';
+import { toast } from 'react-toastify';
+import Logic from './SystemUsers.logic';
+import Styles from './systemUser.module.css';
+import NewSystemUserForm from './Forms/newSystemUserForm';
+import { SystemUserModel } from '../../models/SystemUserModel';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -95,39 +95,40 @@ const CustomTablePagination = styled(TablePaginationUnstyled)(
   `
 );
 
-const Users = () => {
+const SystemUsers = () => {
   const {
     requestSearch,
     handleChangePage,
     handleChangeRowsPerPage,
     handleUpdateUser,
-    getAllUser,
+    getAllSystemUser,
     page,
     rowsPerPage,
     columns,
     rows,
     searched,
   } = Logic();
-
-  const [selectedUser, setSelectedUser] = useState<userModel | null>(null);
+  const [selectedUser, setSelectedUser] = useState<SystemUserModel | null>(
+    null
+  );
   const [deleteUser, setDeleteUser] = useState(false);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const handleDeleteUser = async (data: any) => {
-    const result = await window.Main.deactivateUser(data);
-
+    const result = await window.Main.deactivateSystemUser(data);
     if (result === 1) {
       toast.warning('Este usuario ya fue eliminado');
     } else if (result === 2) {
       toast.success('Usuario eliminado con éxito');
-      getAllUser();
+      getAllSystemUser();
       handleClose();
     } else {
       toast.error('Error al eliminar usuario');
     }
   };
+
   return (
     <div>
       <Paper
@@ -139,7 +140,7 @@ const Users = () => {
         }}
         className="align-middle"
       >
-        <p className="fs-4 fw-bold mb-0 ">Usuarios</p>
+        <p className="fs-4 fw-bold mb-0 ">Usuarios de sistema</p>
 
         <Button
           startIcon={
@@ -289,6 +290,7 @@ const Users = () => {
                   className="btn btn-danger"
                   onClick={() => {
                     handleDeleteUser(selectedUser);
+                    setDeleteUser(false);
                   }}
                 >
                   Eliminar
@@ -313,7 +315,10 @@ const Users = () => {
                   ></i>
                 </IconButton>
               </Grid>
-              <NewUserForm handleClose={handleClose} />
+              <NewSystemUserForm
+                handleClose={handleClose}
+                getAllSystemUser={getAllSystemUser}
+              />
             </div>
           )}
         </Box>
@@ -322,4 +327,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default SystemUsers;

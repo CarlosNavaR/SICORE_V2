@@ -14,8 +14,33 @@ export const api = {
     return result;
   },
 
+  newUser: async (data: any) => {
+    const result = await ipcRenderer.invoke('REGISTER_USER', data);
+    return result;
+  },
+
+  newSystemUser: async (data: any) => {
+    const result = await ipcRenderer.invoke('REGISTER_SYSTEM_USER', data);
+    return result;
+  },
+
+  deactivateSystemUser: async (data: any) => {
+    const result = await ipcRenderer.invoke('DEACTIVATE_SYSTEM_USER', data);
+    return result;
+  },
+
+  deactivateUser: async (data: any) => {
+    const result = await ipcRenderer.invoke('DEACTIVATE_USER', data);
+    return result;
+  },
+
   getAllUsers: () => {
     const users = ipcRenderer.invoke('Get_all_users');
+    return users;
+  },
+
+  getAllSystemUsers: () => {
+    const users = ipcRenderer.invoke('Get_all_system_users');
     return users;
   },
   /**

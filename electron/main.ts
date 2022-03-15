@@ -1,5 +1,13 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
-import { login, getAllUsers } from '../src/Services/sqlDataService';
+import {
+  login,
+  getAllUsers,
+  registerNewUser,
+  getAllSystemUsers,
+  registerNewSystemUser,
+  deactivateSystemUser,
+  deactivateUser,
+} from '../src/Services/sqlDataService';
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
 const path = require('path');
@@ -57,5 +65,34 @@ ipcMain.handle('VALIDATE_LOGIN', async (event, data) => {
 
 ipcMain.handle('Get_all_users', async () => {
   const result = await getAllUsers();
+  return result;
+});
+
+ipcMain.handle('Get_all_system_users', async () => {
+  const result = await getAllSystemUsers();
+  return result;
+});
+
+ipcMain.handle('REGISTER_USER', async (event, data) => {
+  const result = await registerNewUser(data);
+
+  return result;
+});
+
+ipcMain.handle('REGISTER_SYSTEM_USER', async (event, data) => {
+  const result = await registerNewSystemUser(data);
+
+  return result;
+});
+
+ipcMain.handle('DEACTIVATE_SYSTEM_USER', async (event, data) => {
+  const result = await deactivateSystemUser(data);
+
+  return result;
+});
+
+ipcMain.handle('DEACTIVATE_USER', async (event, data) => {
+  const result = await deactivateUser(data);
+
   return result;
 });

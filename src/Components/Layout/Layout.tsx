@@ -9,9 +9,7 @@ type Props = {
 
 const Layout = () => {
   const { isLogin } = useContext(AuthContext);
-  {
-    console.log('🚀 ~ file: Layout.tsx ~ line 12 ~ Layout ~ isLogin', isLogin);
-  }
+
   return (
     <div className={isLogin ? styles.gridLayout : styles.noGridLayout}>
       {isLogin && <Sidebar />}

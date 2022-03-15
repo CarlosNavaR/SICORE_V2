@@ -76,7 +76,7 @@ const Sidebar = () => {
           </Link>
         </li>
         <li className="nav-item mb-1">
-          <Link to="system-users" className="nav-link text-dark">
+          <Link to="SystemUsers" className="nav-link text-dark">
             <i className="fa-solid fa-user-lock me-3"></i>
             Usuarios de sistema
           </Link>
