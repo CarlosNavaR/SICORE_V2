@@ -27,10 +27,6 @@ const NewUserForm = ({ handleClose }: Props) => {
 
   const onSubmit: SubmitHandler<NewUserInputs> = async (data) => {
     await window.Main.newUser(data).then((response) => {
-      console.log(
-        '🚀 ~ file: newUserForm.tsx ~ line 30 ~ awaitwindow.Main.newUser ~ response',
-        response
-      );
       if (response === 1) {
         toast.warning('Usuario ya registrado');
       } else if (response === 2) {

@@ -13,7 +13,8 @@ import Home from './Modules/Home/home';
 import AuthProvider from './Context/Authcontext';
 import PrivateRoute from './Routes/PrivateRoute';
 import Layout from './Components/Layout/Layout';
-
+import Inventory from './Modules/Inventory/Inventory';
+import Maintenance from './Modules/Inventory/MaintenanceEquipment/MaintenanceEquipment';
 export function App() {
   return (
     <div>
@@ -29,6 +30,22 @@ export function App() {
                 element={
                   <PrivateRoute>
                     <Home />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/Inventory"
+                element={
+                  <PrivateRoute>
+                    <Inventory />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/Maintenance"
+                element={
+                  <PrivateRoute>
+                    <Maintenance />
                   </PrivateRoute>
                 }
               />

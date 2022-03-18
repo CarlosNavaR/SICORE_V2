@@ -3,21 +3,22 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import { toast } from 'react-toastify';
 import { useForm, SubmitHandler } from 'react-hook-form';
-type NewUserInputs = {
-  InstitutionalCode: string;
-  FirstName: string;
-  FatherLastname: string;
-  MotherLastname: string;
-  Password: string;
-  IdUserRole: string;
+
+type NewEquipmentInputs = {
+  Code: string;
+  SerialNumber: string;
+  Description: string;
+  Location: string;
+  IdEquipmentType: number;
+  IdEquipmentQualityStatus: number;
+  IsUnique: number;
 };
 
 type Props = {
   handleClose: () => void;
-  getAllSystemUser: () => void;
 };
 
-const NewSystemUserForm = ({ handleClose, getAllSystemUser }: Props) => {
+const NewSystemUserForm = ({ handleClose }: Props) => {
   const {
     register,
     handleSubmit,
@@ -30,7 +31,6 @@ const NewSystemUserForm = ({ handleClose, getAllSystemUser }: Props) => {
         toast.warning('Usuario ya registrado');
       } else if (response === 2) {
         toast.success('Usuario registrado con éxito');
-        getAllSystemUser();
         handleClose();
       } else {
         toast.error('Error al registrar usuario');

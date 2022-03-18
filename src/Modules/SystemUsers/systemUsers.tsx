@@ -281,7 +281,10 @@ const SystemUsers = () => {
                 <button
                   type="button"
                   className="btn btn-secondary"
-                  onClick={handleClose}
+                  onClick={() => {
+                    handleClose();
+                    setDeleteUser(false);
+                  }}
                 >
                   Cancelar
                 </button>

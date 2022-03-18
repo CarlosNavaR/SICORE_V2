@@ -3,6 +3,9 @@ import { db } from './database';
 import { SystemUserModel } from '../models/SystemUserModel';
 import { userModel } from '../models/userModel';
 import { AuthModel } from '_/models/authModel';
+import { displayEquipmentModel } from '../models/displayEquipmentModel';
+import { displayMaintenanceEquipmentModel } from '../models/displayMaintenanceEquipmentModel';
+
 const connection = db.dbConnection();
 
 export const login = async (data: any) => {
@@ -117,6 +120,7 @@ export const deactivateSystemUser = async (data: any) => {
     return false;
   }
 };
+
 export const deactivateUser = async (data: any) => {
   try {
     const userExist = await getUserByInstitutionalCode(data.InstitutionalCode);
@@ -176,6 +180,7 @@ export const getAllUsers = async (): Promise<userModel> => {
 
   return result;
 };
+
 export const getAllSystemUsers = async (): Promise<SystemUserModel> => {
   const sqlQuery =
     'SELECT u.Id, u.InstitutionalCode, u.FirstName, u.FatherLastname,  u.MotherLastname,IF(u.Password IS NULL, u.Password, "******") AS Password, u.EnrollmentDate,  ur.Name as RoleType FROM systemuser u INNER JOIN systemuserRole ur ON u.IdSystemUserRole = ur.Id WHERE u.IsActive = 1';
@@ -186,3 +191,26 @@ export const getAllSystemUsers = async (): Promise<SystemUserModel> => {
 
   return result;
 };
+
+export const getAllEquipment = async (): Promise<displayEquipmentModel> => {
+  const sqlQuery =
+    'SELECT `e`.`Id`, `e`.`IdEquipmentType`, `et`.`Name` `EquipmentTypeName`, `e`.`IdEquipmentQualityStatus`, `eqs`.`Name` `EquipmentQualityStatusName`, `e`.`SerialNumber`, `e`.`Description`, `e`.`Location`, `e`.`Code` FROM `Equipment` `e` INNER JOIN `EquipmentType` `et` ON `e`.`IdEquipmentType` = `et`.`Id` INNER JOIN `EquipmentQualityStatus` `eqs` ON `e`.`IdEquipmentQualityStatus` = `eqs`.`Id` WHERE `e`.`IsActive` = 1;';
+
+  const [result, fields] = await (
+    await connection
+  ).query<displayEquipmentModel & RowDataPacket[][]>(sqlQuery);
+
+  return result;
+};
+
+export const getAllMaintenanceEquipment =
+  async (): Promise<displayMaintenanceEquipmentModel> => {
+    const sqlQuery =
+      'Select	`Equipment`.`Id`, `Equipment`.`SerialNumber`, `Equipment`.`IdEquipmentType`, `ET`.`Name`                             `EquipmentTypeName`, `Equipment`.`Location`, `Equipment`.`IdEquipmentQualityStatus` , `eqs`.`Name`                            `EquipmentQualityStatusName`, `Equipment`.`Description`, `Equipment`.`Code`, `Mantenimiento`.`ID`		`IdMaintenance`, `Mantenimiento`.`Frecuencia`, `Mantenimiento`.`UltimoMant`, `Mantenimiento`.`ProximoMant`, `Mantenimiento`.`EnMantenimiento` from `Equipment` inner join `Mantenimiento` on `Equipment`.`ID` = `Mantenimiento`.`IdEquipment` INNER JOIN `EquipmentType` `ET` ON `IdEquipmentType` = `ET`.`Id` INNER JOIN `EquipmentQualityStatus` `eqs` ON `Equipment`.`IdEquipmentQualityStatus` = `eqs`.`Id` where `Equipment`.`IsActive` = 1 and `Mantenimiento`.`EnMantenimiento` = 0 ORDER BY `Mantenimiento`.`ProximoMant`;';
+
+    const [result, fields] = await (
+      await connection
+    ).query<displayMaintenanceEquipmentModel & RowDataPacket[][]>(sqlQuery);
+
+    return result;
+  };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -6,7 +6,6 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Logic from './Users.logic';
 import { styled } from '@mui/system';
 import TablePaginationUnstyled from '@mui/base/TablePaginationUnstyled';
 import TextField from '@mui/material/TextField';
@@ -16,9 +15,9 @@ import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import { toast } from 'react-toastify';
 import Grid from '@mui/material/Grid';
-import NewUserForm from './Forms/newUserForm';
-import Styles from './user.module.css';
-import { userModel } from '../../models/userModel';
+import Styles from './equipment.module.css';
+import Logic from './Equipment.logic';
+import { displayEquipmentModel } from '../../../models/displayEquipmentModel';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -95,13 +94,13 @@ const CustomTablePagination = styled(TablePaginationUnstyled)(
   `
 );
 
-const Users = () => {
+const Equipment = () => {
   const {
     requestSearch,
     handleChangePage,
     handleChangeRowsPerPage,
-    handleUpdateUser,
-    getAllUser,
+    handleUpdateEquipment,
+    getAllEquipment,
     page,
     rowsPerPage,
     columns,
@@ -109,25 +108,13 @@ const Users = () => {
     searched,
   } = Logic();
 
-  const [selectedUser, setSelectedUser] = useState<userModel | null>(null);
-  const [deleteUser, setDeleteUser] = useState(false);
+  const [selectedEquipment, setSelectedEquipment] =
+    useState<displayEquipmentModel | null>(null);
+  const [deleteEquipment, setDeleteEquipment] = useState(false);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleDeleteUser = async (data: any) => {
-    const result = await window.Main.deactivateUser(data);
-
-    if (result === 1) {
-      toast.warning('Este usuario ya fue eliminado');
-    } else if (result === 2) {
-      toast.success('Usuario eliminado con éxito');
-      getAllUser();
-      handleClose();
-    } else {
-      toast.error('Error al eliminar usuario');
-    }
-  };
   return (
     <div>
       <Paper
@@ -139,18 +126,18 @@ const Users = () => {
         }}
         className="align-middle"
       >
-        <p className="fs-4 fw-bold mb-0 ">Usuarios</p>
+        <p className="fs-4 fw-bold mb-0 ">Inventario</p>
 
         <Button
           startIcon={
             <i
-              className="fa-solid fa-user-plus"
+              className="fa-solid fa-folder-plus"
               style={{ color: 'var(--blue)', fontSize: 14 }}
             ></i>
           }
           onClick={handleOpen}
         >
-          Nuevo usuario
+          Nuevo equipo
         </Button>
       </Paper>
 
@@ -166,7 +153,7 @@ const Users = () => {
           label="Buscar"
           style={{ marginBottom: 15 }}
         />
-        <TableContainer sx={{ maxHeight: 550 }}>
+        <TableContainer sx={{ maxHeight: 500 }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
@@ -204,8 +191,8 @@ const Users = () => {
                         <IconButton
                           aria-label="delete"
                           onClick={() => {
-                            setDeleteUser(true);
-                            setSelectedUser(row);
+                            setDeleteEquipment(true);
+                            setSelectedEquipment(row);
                             handleOpen();
                           }}
                         >
@@ -217,12 +204,25 @@ const Users = () => {
                         <IconButton
                           aria-label="edit"
                           onClick={() => {
-                            handleUpdateUser(row);
+                            handleUpdateEquipment(row);
                           }}
                         >
                           <i
                             className="fa-solid fa-pencil"
                             style={{ color: 'var(--blue)', fontSize: 14 }}
+                          ></i>
+                        </IconButton>
+                        <IconButton
+                          aria-label="qr"
+                          onClick={() => {
+                            setDeleteEquipment(true);
+                            setSelectedEquipment(row);
+                            handleOpen();
+                          }}
+                        >
+                          <i
+                            className="fa-solid fa-qrcode"
+                            style={{ color: 'black', fontSize: 14 }}
                           ></i>
                         </IconButton>
                       </TableCell>
@@ -252,78 +252,8 @@ const Users = () => {
           }}
         />
       </Paper>
-
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          {deleteUser ? (
-            <div>
-              <div className="modal-header flex-column">
-                <div className="icon-box">
-                  <i
-                    className="fa-solid fa-triangle-exclamation"
-                    style={{ fontSize: 30, color: 'red' }}
-                  ></i>
-                </div>
-              </div>
-              <div className="modal-body">
-                <p>
-                  Estas seguro que deseas eliminar este registro? Este proceso
-                  no puede ser revertido.
-                </p>
-              </div>
-              <div className="modal-footer justify-content-center">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => {
-                    handleClose();
-                    setDeleteUser(false);
-                  }}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  onClick={() => {
-                    handleDeleteUser(selectedUser);
-                    setDeleteUser(false);
-                  }}
-                >
-                  Eliminar
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div>
-              <Grid
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <p className="fs-4 fw-bold" style={{ color: 'var(--blue)' }}>
-                  Registrar usuario
-                </p>
-                <IconButton onClick={handleClose}>
-                  <i
-                    className="fa-solid fa-xmark"
-                    style={{ color: 'var(--red)' }}
-                  ></i>
-                </IconButton>
-              </Grid>
-              <NewUserForm handleClose={handleClose} />
-            </div>
-          )}
-        </Box>
-      </Modal>
     </div>
   );
 };
 
-export default Users;
+export default Equipment;

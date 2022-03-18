@@ -53,15 +53,25 @@ const Sidebar = () => {
           </Link>
         </li>
         <li className="nav-item mb-1">
-          <Link to="laboratories" className="nav-link text-dark">
-            <i className="fa-solid fa-screwdriver-wrench me-3"></i>
-            Laboratorios
+          <Link
+            to="inventory"
+            className={`nav-link  ${
+              location.hash === '#/inventory' ? 'active' : 'text-dark'
+            }`}
+          >
+            <i className="fa-solid fa-box-archive me-3"></i>
+            Inventario
           </Link>
         </li>
         <li className="nav-item mb-1">
-          <Link to="inventory" className="nav-link text-dark">
-            <i className="fa-solid fa-box-archive me-3"></i>
-            Inventario
+          <Link
+            to="Maintenance"
+            className={`nav-link  ${
+              location.hash === '#/Maintenance' ? 'active' : 'text-dark'
+            }`}
+          >
+            <i className="fa-solid fa-screwdriver-wrench me-3"></i>
+            Mantenimiento
           </Link>
         </li>
         <li className="nav-item mb-1">
@@ -76,7 +86,12 @@ const Sidebar = () => {
           </Link>
         </li>
         <li className="nav-item mb-1">
-          <Link to="SystemUsers" className="nav-link text-dark">
+          <Link
+            to="SystemUsers"
+            className={`nav-link  ${
+              location.hash === '#/SystemUsers' ? 'active' : 'text-dark'
+            }`}
+          >
             <i className="fa-solid fa-user-lock me-3"></i>
             Usuarios de sistema
           </Link>

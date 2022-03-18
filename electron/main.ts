@@ -7,6 +7,8 @@ import {
   registerNewSystemUser,
   deactivateSystemUser,
   deactivateUser,
+  getAllEquipment,
+  getAllMaintenanceEquipment,
 } from '../src/Services/sqlDataService';
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
@@ -93,6 +95,21 @@ ipcMain.handle('DEACTIVATE_SYSTEM_USER', async (event, data) => {
 
 ipcMain.handle('DEACTIVATE_USER', async (event, data) => {
   const result = await deactivateUser(data);
+
+  return result;
+});
+
+ipcMain.handle('Get_all_equipment', async () => {
+  const result = await getAllEquipment();
+  return result;
+});
+
+ipcMain.handle('Get_all_maintenance_equipment', async () => {
+  const result = await getAllMaintenanceEquipment();
+  console.log(
+    '🚀 ~ file: main.ts ~ line 109 ~ ipcMain.handle ~ result',
+    result
+  );
 
   return result;
 });

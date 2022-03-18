@@ -1,15 +1,15 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { userModel } from '../../models/userModel';
+import { displayEquipmentModel } from '../../../models/displayEquipmentModel';
+
 interface Column {
   id:
     | 'Id'
-    | 'InstitutionalCode'
-    | 'FirstName'
-    | 'FatherLastname'
-    | 'MotherLastname'
-    | 'InstitutionalEmail'
-    | 'EnrollmentDate'
-    | 'RoleType';
+    | 'EquipmentTypeName'
+    | 'Code'
+    | 'SerialNumber'
+    | 'Description'
+    | 'Location'
+    | 'EquipmentQualityStatusName';
   label: string;
   minWidth?: number;
   align?: 'right';
@@ -23,17 +23,19 @@ const columns: readonly Column[] = [
     minWidth: 50,
     format: (value: number) => value.toFixed(0),
   },
-  { id: 'InstitutionalCode', label: 'Código institucional', minWidth: 100 },
-  { id: 'FirstName', label: 'Nombre', minWidth: 80 },
-  { id: 'FatherLastname', label: 'Apellido paterno', minWidth: 100 },
-  { id: 'MotherLastname', label: 'Apellido materno', minWidth: 100 },
-  { id: 'InstitutionalEmail', label: 'Correo institucional', minWidth: 120 },
-  { id: 'RoleType', label: 'Tipo de usuario', minWidth: 80 },
+  { id: 'Location', label: 'Ubicación', minWidth: 80 },
+  { id: 'Code', label: 'Código', minWidth: 80 },
+  { id: 'EquipmentTypeName', label: 'Equipo', minWidth: 100 },
+  { id: 'SerialNumber', label: 'Numero de serie', minWidth: 100 },
+  { id: 'Description', label: 'Descripción', minWidth: 120 },
+  { id: 'EquipmentQualityStatusName', label: 'Estado', minWidth: 100 },
 ];
 
-const Users = () => {
-  const [rows, setRows] = useState<Array<userModel>>([]);
-  const [rowsSearch, setRowsSearch] = useState<Array<userModel>>([]);
+const Equipment = () => {
+  const [rows, setRows] = useState<Array<displayEquipmentModel>>([]);
+  const [rowsSearch, setRowsSearch] = useState<Array<displayEquipmentModel>>(
+    []
+  );
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [IsLoading, setIsLoading] = useState(true);
@@ -44,17 +46,11 @@ const Users = () => {
 
     if (searchedVal.length > 0) {
       const value = rows.filter((row) => {
-        const actualRow =
-          row.FirstName + ' ' + row.FatherLastname + ' ' + row.MotherLastname;
+        const actualRow = row.Code + ' ' + row.EquipmentTypeName;
         return (
           actualRow.toLowerCase().includes(searchedVal.toLowerCase()) ||
-          row.FatherLastname.toLowerCase().includes(
-            searchedVal.toLowerCase()
-          ) ||
-          row.MotherLastname.toLowerCase().includes(
-            searchedVal.toLowerCase()
-          ) ||
-          row.InstitutionalCode.toLowerCase().includes(
+          row.Code.toLowerCase().includes(searchedVal.toLowerCase()) ||
+          row.EquipmentTypeName.toLowerCase().includes(
             searchedVal.toLowerCase()
           )
         );
@@ -70,8 +66,8 @@ const Users = () => {
     requestSearch(searched);
   };
 
-  const getAllUser = () => {
-    window.Main.getAllUsers()
+  const getAllEquipment = () => {
+    window.Main.getAllEquipment()
       .then((result) => {
         setRows(result);
         setRowsSearch(result);
@@ -83,7 +79,7 @@ const Users = () => {
 
   // its used for load data in first instance
   useEffect(() => {
-    getAllUser();
+    getAllEquipment();
   }, []);
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -97,7 +93,7 @@ const Users = () => {
     setPage(0);
   };
 
-  const handleUpdateUser = (data: any) => {
+  const handleUpdateEquipment = (data: any) => {
     console.log(data);
   };
 
@@ -111,9 +107,9 @@ const Users = () => {
     handleChangeRowsPerPage,
     requestSearch,
     cancelSearch,
-    handleUpdateUser,
-    getAllUser,
+    handleUpdateEquipment,
+    getAllEquipment,
   };
 };
 
-export default Users;
+export default Equipment;

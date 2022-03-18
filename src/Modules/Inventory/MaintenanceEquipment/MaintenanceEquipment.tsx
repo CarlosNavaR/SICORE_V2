@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -6,19 +6,23 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Logic from './Users.logic';
 import { styled } from '@mui/system';
 import TablePaginationUnstyled from '@mui/base/TablePaginationUnstyled';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
+import dayjs from 'dayjs';
+import 'dayjs/locale/es';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import { toast } from 'react-toastify';
 import Grid from '@mui/material/Grid';
-import NewUserForm from './Forms/newUserForm';
-import Styles from './user.module.css';
-import { userModel } from '../../models/userModel';
+import Styles from './maintenanceEquipment.module.css';
+import Logic from './MaintenanceEquipment.logic';
+import { displayMaintenanceEquipmentModel } from '../../../models/displayMaintenanceEquipmentModel';
+
+dayjs.extend(relativeTime).locale('es');
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -95,13 +99,13 @@ const CustomTablePagination = styled(TablePaginationUnstyled)(
   `
 );
 
-const Users = () => {
+const Equipment = () => {
   const {
     requestSearch,
     handleChangePage,
     handleChangeRowsPerPage,
-    handleUpdateUser,
-    getAllUser,
+    handleUpdateEquipment,
+    getAllMaintenanceEquipment,
     page,
     rowsPerPage,
     columns,
@@ -109,25 +113,14 @@ const Users = () => {
     searched,
   } = Logic();
 
-  const [selectedUser, setSelectedUser] = useState<userModel | null>(null);
-  const [deleteUser, setDeleteUser] = useState(false);
+  const [selectedMaintenanceEquipment, setSelectedMaintenanceEquipment] =
+    useState<displayMaintenanceEquipmentModel | null>(null);
+  const [deleteMaintenanceEquipment, setDeleteMaintenanceEquipment] =
+    useState(false);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleDeleteUser = async (data: any) => {
-    const result = await window.Main.deactivateUser(data);
-
-    if (result === 1) {
-      toast.warning('Este usuario ya fue eliminado');
-    } else if (result === 2) {
-      toast.success('Usuario eliminado con éxito');
-      getAllUser();
-      handleClose();
-    } else {
-      toast.error('Error al eliminar usuario');
-    }
-  };
   return (
     <div>
       <Paper
@@ -139,21 +132,20 @@ const Users = () => {
         }}
         className="align-middle"
       >
-        <p className="fs-4 fw-bold mb-0 ">Usuarios</p>
+        <p className="fs-4 fw-bold mb-0 ">Mantenimiento</p>
 
         <Button
           startIcon={
             <i
-              className="fa-solid fa-user-plus"
+              className="fa-solid fa-folder-plus"
               style={{ color: 'var(--blue)', fontSize: 14 }}
             ></i>
           }
           onClick={handleOpen}
         >
-          Nuevo usuario
+          Nuevo equipo
         </Button>
       </Paper>
-
       <Paper
         style={{ padding: '1rem', marginTop: '1.5rem' }}
         className={Styles.root}
@@ -166,7 +158,7 @@ const Users = () => {
           label="Buscar"
           style={{ marginBottom: 15 }}
         />
-        <TableContainer sx={{ maxHeight: 550 }}>
+        <TableContainer sx={{ maxHeight: 500 }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
@@ -194,7 +186,11 @@ const Users = () => {
                         const value = row[column.id];
                         return (
                           <TableCell key={column.id} align={column.align}>
-                            {column.format && typeof value === 'number'
+                            {column.formatDate
+                              ? dayjs(new Date(value + 'Z'))
+                                  .format('DD MMM, YYYY')
+                                  .toString()
+                              : column.format && typeof value === 'number'
                               ? column.format(value)
                               : value}
                           </TableCell>
@@ -204,8 +200,8 @@ const Users = () => {
                         <IconButton
                           aria-label="delete"
                           onClick={() => {
-                            setDeleteUser(true);
-                            setSelectedUser(row);
+                            setDeleteMaintenanceEquipment(true);
+                            setSelectedMaintenanceEquipment(row);
                             handleOpen();
                           }}
                         >
@@ -217,12 +213,25 @@ const Users = () => {
                         <IconButton
                           aria-label="edit"
                           onClick={() => {
-                            handleUpdateUser(row);
+                            handleUpdateEquipment(row);
                           }}
                         >
                           <i
                             className="fa-solid fa-pencil"
                             style={{ color: 'var(--blue)', fontSize: 14 }}
+                          ></i>
+                        </IconButton>
+                        <IconButton
+                          aria-label="qr"
+                          onClick={() => {
+                            setDeleteMaintenanceEquipment(true);
+                            setSelectedMaintenanceEquipment(row);
+                            handleOpen();
+                          }}
+                        >
+                          <i
+                            className="fa-solid fa-screwdriver-wrench"
+                            style={{ color: 'black', fontSize: 14 }}
                           ></i>
                         </IconButton>
                       </TableCell>
@@ -252,78 +261,8 @@ const Users = () => {
           }}
         />
       </Paper>
-
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          {deleteUser ? (
-            <div>
-              <div className="modal-header flex-column">
-                <div className="icon-box">
-                  <i
-                    className="fa-solid fa-triangle-exclamation"
-                    style={{ fontSize: 30, color: 'red' }}
-                  ></i>
-                </div>
-              </div>
-              <div className="modal-body">
-                <p>
-                  Estas seguro que deseas eliminar este registro? Este proceso
-                  no puede ser revertido.
-                </p>
-              </div>
-              <div className="modal-footer justify-content-center">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => {
-                    handleClose();
-                    setDeleteUser(false);
-                  }}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  onClick={() => {
-                    handleDeleteUser(selectedUser);
-                    setDeleteUser(false);
-                  }}
-                >
-                  Eliminar
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div>
-              <Grid
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <p className="fs-4 fw-bold" style={{ color: 'var(--blue)' }}>
-                  Registrar usuario
-                </p>
-                <IconButton onClick={handleClose}>
-                  <i
-                    className="fa-solid fa-xmark"
-                    style={{ color: 'var(--red)' }}
-                  ></i>
-                </IconButton>
-              </Grid>
-              <NewUserForm handleClose={handleClose} />
-            </div>
-          )}
-        </Box>
-      </Modal>
     </div>
   );
 };
 
-export default Users;
+export default Equipment;

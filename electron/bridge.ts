@@ -43,6 +43,16 @@ export const api = {
     const users = ipcRenderer.invoke('Get_all_system_users');
     return users;
   },
+
+  getAllEquipment: () => {
+    const Equipment = ipcRenderer.invoke('Get_all_equipment');
+    return Equipment;
+  },
+
+  getAllMaintenanceEquipment: () => {
+    const Equipment = ipcRenderer.invoke('Get_all_maintenance_equipment');
+    return Equipment;
+  },
   /**
    * Provide an easier way to listen to events
    */
