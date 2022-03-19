@@ -21,6 +21,7 @@ import Grid from '@mui/material/Grid';
 import Styles from './maintenanceEquipment.module.css';
 import Logic from './MaintenanceEquipment.logic';
 import { displayMaintenanceEquipmentModel } from '../../../models/displayMaintenanceEquipmentModel';
+import NewMaintenanceForm from '../Forms/newMaintenance';
 
 dayjs.extend(relativeTime).locale('es');
 
@@ -261,6 +262,35 @@ const Equipment = () => {
           }}
         />
       </Paper>
+
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <div>
+            <Grid
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+              }}
+            >
+              <p className="fs-4 fw-bold" style={{ color: 'var(--blue)' }}>
+                Registrar equipo
+              </p>
+              <IconButton onClick={handleClose}>
+                <i
+                  className="fa-solid fa-xmark"
+                  style={{ color: 'var(--red)' }}
+                ></i>
+              </IconButton>
+            </Grid>
+            <NewMaintenanceForm handleClose={handleClose} />
+          </div>
+        </Box>
+      </Modal>
     </div>
   );
 };

@@ -9,6 +9,9 @@ import {
   deactivateUser,
   getAllEquipment,
   getAllMaintenanceEquipment,
+  getAllEquipmentTypes,
+  getAllEquipmentQualityStatus,
+  registerNewEquipment,
 } from '../src/Services/sqlDataService';
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
@@ -106,10 +109,20 @@ ipcMain.handle('Get_all_equipment', async () => {
 
 ipcMain.handle('Get_all_maintenance_equipment', async () => {
   const result = await getAllMaintenanceEquipment();
-  console.log(
-    '🚀 ~ file: main.ts ~ line 109 ~ ipcMain.handle ~ result',
-    result
-  );
+  return result;
+});
 
+ipcMain.handle('Get_All_EquipmentTypes', async () => {
+  const result = await getAllEquipmentTypes();
+  return result;
+});
+
+ipcMain.handle('Get_All_EquipmentQualityStatus', async () => {
+  const result = await getAllEquipmentQualityStatus();
+  return result;
+});
+
+ipcMain.handle('Register_Equipment', async (event, registerType, data) => {
+  const result = await registerNewEquipment(registerType, data);
   return result;
 });

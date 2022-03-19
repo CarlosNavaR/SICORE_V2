@@ -8,4 +8,5 @@ export type MaintenanceEquipmentModel = {
   IdEquipmentQualityStatus: number;
   Frecuencia: number;
   UltimoMant: Date;
+  IsUnique: number;
 };

@@ -5,6 +5,9 @@ import { userModel } from '../models/userModel';
 import { AuthModel } from '_/models/authModel';
 import { displayEquipmentModel } from '../models/displayEquipmentModel';
 import { displayMaintenanceEquipmentModel } from '../models/displayMaintenanceEquipmentModel';
+import { EquipmentTypeModel } from '../models/equipmentTypeModel';
+import { EquipmentQualityStatusModel } from '../models/equipmentQualityStatus';
+import { EquipmentModel } from '../models/EquipmentModel';
 
 const connection = db.dbConnection();
 
@@ -214,3 +217,98 @@ export const getAllMaintenanceEquipment =
 
     return result;
   };
+
+export const getAllEquipmentTypes = async (): Promise<EquipmentTypeModel> => {
+  const sqlQuery =
+    'Select Id, Name, Description from EquipmentType where IsActive = 1';
+
+  const [result, fields] = await (
+    await connection
+  ).query<EquipmentTypeModel & RowDataPacket[][]>(sqlQuery);
+
+  return result;
+};
+
+export const getAllEquipmentQualityStatus =
+  async (): Promise<EquipmentQualityStatusModel> => {
+    const sqlQuery =
+      'Select Id, Name, Description from equipmentqualitystatus where IsActive = 1';
+
+    const [result, fields] = await (
+      await connection
+    ).query<EquipmentQualityStatusModel & RowDataPacket[][]>(sqlQuery);
+
+    return result;
+  };
+
+export const getEquipmentByCode = async (
+  code: any
+): Promise<EquipmentModel> => {
+  const sqlQuery = 'SELECT * FROM equipment WHERE Code=? AND isActive=1';
+
+  const [result, fields] = await (
+    await connection
+  ).query<EquipmentModel & RowDataPacket[][]>(sqlQuery, code);
+
+  return result;
+};
+
+export const registerNewEquipment = async (
+  registerType: boolean,
+  data: any
+) => {
+  console.log('🚀 ~ file: sqlDataService.ts ~ line 260 ~ data', data);
+  try {
+    const equipmentExist = await getEquipmentByCode(data.Code);
+
+    //@ts-ignore
+    if (equipmentExist.length > 0) {
+      return 1;
+    } else {
+      if (registerType === true) {
+        const sqlQuery =
+          'CALL `sicore`.`RegisterEquipment`(1, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?);';
+        const [rows, fields] = await (
+          await connection
+        ).query(sqlQuery, [
+          data.IdEquipmentType,
+          data.IdEquipmentQualityStatus,
+          data.SerialNumber,
+          data.Code,
+          data.Description,
+          data.Location,
+          data.Frecuencia,
+          data.UltimoMant,
+          data.IsUnique,
+        ]);
+
+        //@ts-ignore
+        if (rows.affectedRows > 0) {
+          return 2;
+        } else return 3;
+      } else {
+        const sqlQuery =
+          'INSERT INTO Equipment(IdEquipmentType, IdEquipmentQualityStatus, SerialNumber, Code, Description, Location) values(?, ?, ?, ?, ?, ?);';
+        const [rows, fields] = await (
+          await connection
+        ).query(sqlQuery, [
+          data.IdEquipmentType,
+          data.IdEquipmentQualityStatus,
+          data.SerialNumber,
+          data.Code,
+          data.Description,
+          data.Location,
+          data.IsUnique,
+        ]);
+
+        //@ts-ignore
+        if (rows.affectedRows > 0) {
+          return 2;
+        } else return 3;
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};

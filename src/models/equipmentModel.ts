@@ -7,4 +7,5 @@ export type EquipmentModel = {
   IsActive: number;
   IdEquipmentType: number;
   IdEquipmentQualityStatus: number;
+  IsUnique: number;
 };

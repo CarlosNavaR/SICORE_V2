@@ -35,7 +35,7 @@ const Login = () => {
                           className="h3 fw-bold mb-0"
                           style={{ color: 'var(--blue)' }}
                         >
-                          Ingeniería Industrial - SICORE
+                          Sistema de Control y Recursos
                         </span>
                       </div>
 

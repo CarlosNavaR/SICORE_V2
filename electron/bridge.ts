@@ -1,5 +1,4 @@
 import { contextBridge, ipcRenderer } from 'electron';
-
 export const api = {
   /**
    * Here you can expose functions to the renderer process
@@ -53,6 +52,22 @@ export const api = {
     const Equipment = ipcRenderer.invoke('Get_all_maintenance_equipment');
     return Equipment;
   },
+
+  getAllEquipmentTypes: () => {
+    const EquipmentTypes = ipcRenderer.invoke('Get_All_EquipmentTypes');
+    return EquipmentTypes;
+  },
+
+  getAllEquipmentQualityStatus: () => {
+    const EquipmentTypes = ipcRenderer.invoke('Get_All_EquipmentQualityStatus');
+    return EquipmentTypes;
+  },
+
+  registerNewEquipment: (registerType: boolean, data: any) => {
+    const result = ipcRenderer.invoke('Register_Equipment', registerType, data);
+    return result;
+  },
+
   /**
    * Provide an easier way to listen to events
    */

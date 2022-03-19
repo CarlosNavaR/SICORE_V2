@@ -18,6 +18,7 @@ import Grid from '@mui/material/Grid';
 import Styles from './equipment.module.css';
 import Logic from './Equipment.logic';
 import { displayEquipmentModel } from '../../../models/displayEquipmentModel';
+import NewEquipmentForm from '../Forms/newEquipment';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -252,6 +253,38 @@ const Equipment = () => {
           }}
         />
       </Paper>
+
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <div>
+            <Grid
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+              }}
+            >
+              <p className="fs-4 fw-bold" style={{ color: 'var(--blue)' }}>
+                Registrar equipo
+              </p>
+              <IconButton onClick={handleClose}>
+                <i
+                  className="fa-solid fa-xmark"
+                  style={{ color: 'var(--red)' }}
+                ></i>
+              </IconButton>
+            </Grid>
+            <NewEquipmentForm
+              handleClose={handleClose}
+              getAllEquipment={getAllEquipment}
+            />
+          </div>
+        </Box>
+      </Modal>
     </div>
   );
 };
