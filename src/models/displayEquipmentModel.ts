@@ -6,6 +6,7 @@ export type displayEquipmentModel = {
   SerialNumber: string;
   Description: string;
   Location: string;
+  IsUnique: number;
   IsActive: number;
   IdEquipmentQualityStatus: number;
   EquipmentQualityStatusName: string;

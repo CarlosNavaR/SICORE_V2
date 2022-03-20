@@ -13,6 +13,7 @@ import {
   getAllEquipmentQualityStatus,
   registerNewEquipment,
   updateUser,
+  updateEquipment,
 } from '../src/Services/sqlDataService';
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
@@ -133,3 +134,16 @@ ipcMain.handle('Register_Equipment', async (event, registerType, data) => {
   const result = await registerNewEquipment(registerType, data);
   return result;
 });
+
+ipcMain.handle(
+  'Update_Equipment',
+  async (event, registerType, data, IdEquipment, IdMaintenance) => {
+    const result = await updateEquipment(
+      registerType,
+      data,
+      IdEquipment,
+      IdMaintenance
+    );
+    return result;
+  }
+);

@@ -73,6 +73,22 @@ export const api = {
     return result;
   },
 
+  updateEquipment: (
+    registerType: boolean,
+    data: any,
+    IdEquipment: number,
+    IdMaintenance: number
+  ) => {
+    const result = ipcRenderer.invoke(
+      'Update_Equipment',
+      registerType,
+      data,
+      IdEquipment,
+      IdMaintenance
+    );
+    return result;
+  },
+
   /**
    * Provide an easier way to listen to events
    */

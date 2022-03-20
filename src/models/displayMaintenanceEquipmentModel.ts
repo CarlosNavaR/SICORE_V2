@@ -12,5 +12,6 @@ export type displayMaintenanceEquipmentModel = {
   Frecuencia: string;
   UltimoMant: Date;
   ProximoMant: Date;
+  IsUnique: number;
   EnMantenimiento: number;
 };

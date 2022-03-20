@@ -92,6 +92,30 @@ export const updateUser = async (data: any, IdUser: number) => {
   }
 };
 
+export const deactivateUser = async (data: any) => {
+  try {
+    const userExist = await getUserByInstitutionalCode(data.InstitutionalCode);
+
+    //@ts-ignore
+    if (userExist.length > 0) {
+      const sqlQuery = 'UPDATE User SET IsActive=0 WHERE Id=?';
+      const [rows, fields] = await (
+        await connection
+      ).query(sqlQuery, [data.Id]);
+
+      //@ts-ignore
+      if (rows.affectedRows > 0) {
+        return 2;
+      } else return 3;
+    } else {
+      return 1;
+    }
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 export const registerNewSystemUser = async (data: any) => {
   try {
     const userExist = await getSystemUserByInstitutionalCode(
@@ -126,6 +150,34 @@ export const registerNewSystemUser = async (data: any) => {
   }
 };
 
+export const updateSystemUser = async (data: any, IdUser: number) => {
+  try {
+    //@ts-ignore
+
+    const sqlQuery =
+      'UPDATE systemuser SET FirstName=?,FatherLastname=?,MotherLastname=?,InstitutionalCode=?,Password=?,IdSystemUserRole=? WHERE Id=?';
+    const [rows, fields] = await (
+      await connection
+    ).query(sqlQuery, [
+      data.FirstName,
+      data.FatherLastname,
+      data.MotherLastname,
+      data.InstitutionalCode,
+      data.Password,
+      data.IdSystemUserRole,
+      IdUser,
+    ]);
+
+    //@ts-ignore
+    if (rows.affectedRows > 0) {
+      return 2;
+    } else return 3;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 export const deactivateSystemUser = async (data: any) => {
   try {
     const userExist = await getSystemUserByInstitutionalCode(
@@ -135,30 +187,6 @@ export const deactivateSystemUser = async (data: any) => {
     //@ts-ignore
     if (userExist.length > 0) {
       const sqlQuery = 'UPDATE systemuser SET IsActive=0 WHERE Id=?';
-      const [rows, fields] = await (
-        await connection
-      ).query(sqlQuery, [data.Id]);
-
-      //@ts-ignore
-      if (rows.affectedRows > 0) {
-        return 2;
-      } else return 3;
-    } else {
-      return 1;
-    }
-  } catch (error) {
-    console.log(error);
-    return false;
-  }
-};
-
-export const deactivateUser = async (data: any) => {
-  try {
-    const userExist = await getUserByInstitutionalCode(data.InstitutionalCode);
-
-    //@ts-ignore
-    if (userExist.length > 0) {
-      const sqlQuery = 'UPDATE User SET IsActive=0 WHERE Id=?';
       const [rows, fields] = await (
         await connection
       ).query(sqlQuery, [data.Id]);
@@ -225,7 +253,7 @@ export const getAllSystemUsers = async (): Promise<SystemUserModel> => {
 
 export const getAllEquipment = async (): Promise<displayEquipmentModel> => {
   const sqlQuery =
-    'SELECT `e`.`Id`, `e`.`IdEquipmentType`, `et`.`Name` `EquipmentTypeName`, `e`.`IdEquipmentQualityStatus`, `eqs`.`Name` `EquipmentQualityStatusName`, `e`.`SerialNumber`, `e`.`Description`, `e`.`Location`, `e`.`Code` FROM `Equipment` `e` INNER JOIN `EquipmentType` `et` ON `e`.`IdEquipmentType` = `et`.`Id` INNER JOIN `EquipmentQualityStatus` `eqs` ON `e`.`IdEquipmentQualityStatus` = `eqs`.`Id` WHERE `e`.`IsActive` = 1  and  `e`.`Id` NOT IN(select IdEquipment from Mantenimiento);';
+    'SELECT `e`.`Id`, `e`.`IdEquipmentType`, `et`.`Name` `EquipmentTypeName`, `e`.`IdEquipmentQualityStatus`,`e`.`IsUnique`, `eqs`.`Name` `EquipmentQualityStatusName`, `e`.`SerialNumber`, `e`.`Description`, `e`.`Location`, `e`.`Code` FROM `Equipment` `e` INNER JOIN `EquipmentType` `et` ON `e`.`IdEquipmentType` = `et`.`Id` INNER JOIN `EquipmentQualityStatus` `eqs` ON `e`.`IdEquipmentQualityStatus` = `eqs`.`Id` WHERE `e`.`IsActive` = 1  and  `e`.`Id` NOT IN(select IdEquipment from Mantenimiento);';
 
   const [result, fields] = await (
     await connection
@@ -237,7 +265,7 @@ export const getAllEquipment = async (): Promise<displayEquipmentModel> => {
 export const getAllMaintenanceEquipment =
   async (): Promise<displayMaintenanceEquipmentModel> => {
     const sqlQuery =
-      'Select	`Equipment`.`Id`, `Equipment`.`SerialNumber`, `Equipment`.`IdEquipmentType`, `ET`.`Name`                             `EquipmentTypeName`, `Equipment`.`Location`, `Equipment`.`IdEquipmentQualityStatus` , `eqs`.`Name`                            `EquipmentQualityStatusName`, `Equipment`.`Description`, `Equipment`.`Code`, `Mantenimiento`.`ID`		`IdMaintenance`, `Mantenimiento`.`Frecuencia`, `Mantenimiento`.`UltimoMant`, `Mantenimiento`.`ProximoMant`, `Mantenimiento`.`EnMantenimiento` from `Equipment` inner join `Mantenimiento` on `Equipment`.`ID` = `Mantenimiento`.`IdEquipment` INNER JOIN `EquipmentType` `ET` ON `IdEquipmentType` = `ET`.`Id` INNER JOIN `EquipmentQualityStatus` `eqs` ON `Equipment`.`IdEquipmentQualityStatus` = `eqs`.`Id` where `Equipment`.`IsActive` = 1 and `Mantenimiento`.`EnMantenimiento` = 0 ORDER BY `Mantenimiento`.`ProximoMant`;';
+      'Select	`Equipment`.`Id`, `Equipment`.`SerialNumber`, `Equipment`.`IdEquipmentType`,`Equipment`.`IsUnique`, `ET`.`Name` `EquipmentTypeName`, `Equipment`.`Location`, `Equipment`.`IdEquipmentQualityStatus` , `eqs`.`Name` `EquipmentQualityStatusName`, `Equipment`.`Description`, `Equipment`.`Code`, `Mantenimiento`.`ID` `IdMaintenance`, `Mantenimiento`.`Frecuencia`, `Mantenimiento`.`UltimoMant`, `Mantenimiento`.`ProximoMant`, `Mantenimiento`.`EnMantenimiento` from `Equipment` inner join `Mantenimiento` on `Equipment`.`ID` = `Mantenimiento`.`IdEquipment` INNER JOIN `EquipmentType` `ET` ON `IdEquipmentType` = `ET`.`Id` INNER JOIN `EquipmentQualityStatus` `eqs` ON `Equipment`.`IdEquipmentQualityStatus` = `eqs`.`Id` where `Equipment`.`IsActive` = 1 and `Mantenimiento`.`EnMantenimiento` = 0 ORDER BY `Mantenimiento`.`ProximoMant`;';
 
     const [result, fields] = await (
       await connection
@@ -333,6 +361,62 @@ export const registerNewEquipment = async (
           return 2;
         } else return 3;
       }
+    }
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+export const updateEquipment = async (
+  registerType: boolean,
+  data: any,
+  IdEquipment: number,
+  IdMaintenance: number
+) => {
+  try {
+    if (registerType === true) {
+      const sqlQuery =
+        'CALL `sicore`.`UpdateEquipment`( ?, ?, ?, ?, ?, ?, ?, ?, ?,0);';
+      const [rows, fields] = await (
+        await connection
+      ).query(sqlQuery, [
+        IdEquipment,
+        IdMaintenance,
+        data.IdEquipmentType,
+        data.IdEquipmentQualityStatus,
+        data.SerialNumber,
+        data.Description,
+        data.Code,
+        data.Location,
+        data.IsUnique,
+        data.Frecuencia,
+        data.UltimoMant,
+      ]);
+
+      //@ts-ignore
+      if (rows.affectedRows > 0) {
+        return 2;
+      } else return 3;
+    } else {
+      const sqlQuery =
+        'UPDATE Equipment SET IdEquipmentType=?, IdEquipmentQualityStatus=?, SerialNumber=?, Code=?, Description=?, Location=?;';
+      const [rows, fields] = await (
+        await connection
+      ).query(sqlQuery, [
+        data.IdEquipmentType,
+        data.IdEquipmentQualityStatus,
+        data.SerialNumber,
+        data.Code,
+        data.Description,
+        data.Location,
+        data.IsUnique,
+      ]);
+
+      //@ts-ignore
+      if (rows.affectedRows > 0) {
+        return 2;
+      } else return 3;
     }
   } catch (error) {
     console.log(error);

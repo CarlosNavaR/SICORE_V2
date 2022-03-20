@@ -120,7 +120,11 @@ const Equipment = () => {
     useState(false);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedMaintenanceEquipment(null);
+  };
+  const handleDeleteEquipment = async (data: any) => {};
 
   return (
     <div>
@@ -214,7 +218,8 @@ const Equipment = () => {
                         <IconButton
                           aria-label="edit"
                           onClick={() => {
-                            handleUpdateEquipment(row);
+                            setSelectedMaintenanceEquipment(row);
+                            handleOpen();
                           }}
                         >
                           <i
@@ -225,9 +230,7 @@ const Equipment = () => {
                         <IconButton
                           aria-label="qr"
                           onClick={() => {
-                            setDeleteMaintenanceEquipment(true);
                             setSelectedMaintenanceEquipment(row);
-                            handleOpen();
                           }}
                         >
                           <i
@@ -270,28 +273,70 @@ const Equipment = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <div>
-            <Grid
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-              }}
-            >
-              <p className="fs-4 fw-bold" style={{ color: 'var(--blue)' }}>
-                Registrar equipo
-              </p>
-              <IconButton onClick={handleClose}>
-                <i
-                  className="fa-solid fa-xmark"
-                  style={{ color: 'var(--red)' }}
-                ></i>
-              </IconButton>
-            </Grid>
-            <NewMaintenanceForm
-              handleClose={handleClose}
-              getAllMaintenanceEquipment={getAllMaintenanceEquipment}
-            />
-          </div>
+          {deleteMaintenanceEquipment ? (
+            <div>
+              <div className="modal-header flex-column">
+                <div className="icon-box">
+                  <i
+                    className="fa-solid fa-triangle-exclamation"
+                    style={{ fontSize: 30, color: 'red' }}
+                  ></i>
+                </div>
+              </div>
+              <div className="modal-body">
+                <p>
+                  Estas seguro que deseas eliminar este registro? Este proceso
+                  no puede ser revertido.
+                </p>
+              </div>
+              <div className="modal-footer justify-content-center">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    handleClose();
+                    setDeleteMaintenanceEquipment(false);
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={() => {
+                    handleDeleteEquipment(selectedMaintenanceEquipment);
+                    setDeleteMaintenanceEquipment(false);
+                  }}
+                >
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <Grid
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <p className="fs-4 fw-bold" style={{ color: 'var(--blue)' }}>
+                  Registrar equipo
+                </p>
+                <IconButton onClick={handleClose}>
+                  <i
+                    className="fa-solid fa-xmark"
+                    style={{ color: 'var(--red)' }}
+                  ></i>
+                </IconButton>
+              </Grid>
+              <NewMaintenanceForm
+                handleClose={handleClose}
+                getAllMaintenanceEquipment={getAllMaintenanceEquipment}
+                selectedMaintenanceEquipment={selectedMaintenanceEquipment}
+              />
+            </div>
+          )}
         </Box>
       </Modal>
     </div>

@@ -110,10 +110,12 @@ const Users = () => {
 
   const [selectedUser, setSelectedUser] = useState<userModel | null>(null);
   const [deleteUser, setDeleteUser] = useState(false);
-  const [updateUser, setUpdateUser] = useState(false);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedUser(null);
+  };
 
   const handleDeleteUser = async (data: any) => {
     const result = await window.Main.deactivateUser(data);
@@ -219,7 +221,6 @@ const Users = () => {
                           aria-label="edit"
                           onClick={() => {
                             setSelectedUser(row);
-                            setUpdateUser(true);
                             handleOpen();
                           }}
                         >

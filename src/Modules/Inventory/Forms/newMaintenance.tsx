@@ -2,9 +2,15 @@ import React, { useState, useEffect } from 'react';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import { toast } from 'react-toastify';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import dayjs from 'dayjs';
+import 'dayjs/locale/es';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { EquipmentTypeModel } from '../../../models/equipmentTypeModel';
 import { EquipmentQualityStatusModel } from '../../../models/equipmentQualityStatus';
+import { displayMaintenanceEquipmentModel } from '../../../models/displayMaintenanceEquipmentModel';
+
+dayjs.extend(relativeTime).locale('es');
 
 type NewMaintenanceEquipmentInputs = {
   Code: string;
@@ -21,17 +27,23 @@ type NewMaintenanceEquipmentInputs = {
 type Props = {
   handleClose: () => void;
   getAllMaintenanceEquipment: () => void;
+  selectedMaintenanceEquipment: displayMaintenanceEquipmentModel | null;
 };
 
 const NewSystemUserForm = ({
   handleClose,
   getAllMaintenanceEquipment,
+  selectedMaintenanceEquipment,
 }: Props) => {
   const [equipmentType, setEquipmentType] = useState<EquipmentTypeModel[]>([]);
   const [equipmentQualityStatus, setEquipmentQualityStatus] = useState<
     EquipmentQualityStatusModel[]
   >([]);
 
+  console.log(
+    '🚀 ~ file: newMaintenance.tsx ~ line 32 ~ selectedMaintenanceEquipment',
+    selectedMaintenanceEquipment
+  );
   const {
     register,
     handleSubmit,
@@ -51,20 +63,39 @@ const NewSystemUserForm = ({
   const onSubmit: SubmitHandler<NewMaintenanceEquipmentInputs> = async (
     data
   ) => {
-    const saveDataForm = data;
-    await window.Main.registerNewEquipment(true, saveDataForm).then(
-      (response) => {
-        if (response === 1) {
-          toast.warning('Equipo ya registrado');
-        } else if (response === 2) {
-          toast.success('Equipo registrado con éxito');
-          handleClose();
-          getAllMaintenanceEquipment();
-        } else {
-          toast.error('Error al registrar Equipo');
+    if (!selectedMaintenanceEquipment) {
+      const saveDataForm = data;
+      await window.Main.registerNewEquipment(true, saveDataForm).then(
+        (response) => {
+          if (response === 1) {
+            toast.warning('Equipo ya registrado');
+          } else if (response === 2) {
+            toast.success('Equipo registrado con éxito');
+            handleClose();
+            getAllMaintenanceEquipment();
+          } else {
+            toast.error('Error al registrar Equipo');
+          }
         }
-      }
-    );
+      );
+    } else {
+      const IdEquipment = selectedMaintenanceEquipment.Id;
+      const IdMaintenance = selectedMaintenanceEquipment.IdMaintenance;
+
+      await window.Main.updateEquipment(
+        true,
+        data,
+        IdEquipment,
+        IdMaintenance
+      ).then((response) => {
+        if (response === 2) {
+          toast.success('Equipo actualizado con éxito');
+          handleClose();
+        } else {
+          toast.error('Error al actualizar equipo');
+        }
+      });
+    }
   };
   return (
     <>
@@ -81,19 +112,37 @@ const NewSystemUserForm = ({
             <div className="form-outline ">
               <label className="form-label">Tipo de equipo</label>
               <select
+                className="form-select"
+                aria-label="Default select example"
                 {...register('IdEquipmentType', {
                   required: true,
                 })}
-                className="form-select"
-                aria-label="Default select example"
-                defaultValue={'DEFAULT'}
+                defaultValue={
+                  selectedMaintenanceEquipment
+                    ? selectedMaintenanceEquipment.IdEquipmentType
+                    : 'DEFAULT'
+                }
               >
-                <option value="DEFAULT" disabled>
-                  Selecciona un tipo
+                <option
+                  value={
+                    selectedMaintenanceEquipment
+                      ? selectedMaintenanceEquipment.IdEquipmentType
+                      : 'DEFAULT'
+                  }
+                  key={
+                    selectedMaintenanceEquipment
+                      ? selectedMaintenanceEquipment.IdEquipmentType
+                      : ''
+                  }
+                  disabled
+                >
+                  {selectedMaintenanceEquipment
+                    ? selectedMaintenanceEquipment.EquipmentTypeName
+                    : 'Selecciona un tipo'}
                 </option>
-                {equipmentType.map(({ Id, Name }) => (
-                  <option key={Id} value={Id}>
-                    {Name}
+                {equipmentType.map((response: any) => (
+                  <option key={response.Id} value={response.Id}>
+                    {response.Name}
                   </option>
                 ))}
                 ;
@@ -111,6 +160,7 @@ const NewSystemUserForm = ({
                 {...register('Code', {
                   required: true,
                 })}
+                defaultValue={selectedMaintenanceEquipment?.Code}
               />
             </div>
           </Grid>
@@ -125,6 +175,7 @@ const NewSystemUserForm = ({
                 {...register('SerialNumber', {
                   required: true,
                 })}
+                defaultValue={selectedMaintenanceEquipment?.SerialNumber}
               />
             </div>
           </Grid>
@@ -139,6 +190,7 @@ const NewSystemUserForm = ({
                 {...register('Location', {
                   required: true,
                 })}
+                defaultValue={selectedMaintenanceEquipment?.Location}
               />
             </div>
           </Grid>
@@ -153,6 +205,7 @@ const NewSystemUserForm = ({
                 {...register('Description', {
                   required: true,
                 })}
+                defaultValue={selectedMaintenanceEquipment?.Description}
               />
             </div>
           </Grid>
@@ -166,7 +219,11 @@ const NewSystemUserForm = ({
                 })}
                 className="form-select"
                 aria-label="Default select example"
-                defaultValue={'DEFAULT'}
+                defaultValue={
+                  selectedMaintenanceEquipment
+                    ? selectedMaintenanceEquipment.IdEquipmentQualityStatus
+                    : 'DEFAULT'
+                }
               >
                 <option value="DEFAULT" disabled>
                   Selecciona un estado
@@ -190,7 +247,11 @@ const NewSystemUserForm = ({
                 })}
                 className="form-select"
                 aria-label="Default select example"
-                defaultValue={'DEFAULT'}
+                defaultValue={
+                  selectedMaintenanceEquipment
+                    ? selectedMaintenanceEquipment.IsUnique
+                    : 'DEFAULT'
+                }
               >
                 <option value="DEFAULT" disabled>
                   Selecciona un tipo
@@ -213,6 +274,7 @@ const NewSystemUserForm = ({
                 {...register('Frecuencia', {
                   required: true,
                 })}
+                defaultValue={selectedMaintenanceEquipment?.Frecuencia}
               />
             </div>
           </Grid>
@@ -227,6 +289,13 @@ const NewSystemUserForm = ({
                 {...register('UltimoMant', {
                   required: true,
                 })}
+                defaultValue={
+                  selectedMaintenanceEquipment
+                    ? dayjs(
+                        new Date(selectedMaintenanceEquipment?.UltimoMant + 'Z')
+                      ).format('YYYY-MM-DD')
+                    : ''
+                }
               />
             </div>
           </Grid>
