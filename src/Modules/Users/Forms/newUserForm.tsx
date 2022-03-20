@@ -3,6 +3,7 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import { toast } from 'react-toastify';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { userModel } from '../../../models/userModel';
 import userLogic from '../Users.logic';
 
 type NewUserInputs = {
@@ -16,9 +17,11 @@ type NewUserInputs = {
 
 type Props = {
   handleClose: () => void;
+  getAllUser: () => void;
+  selectedUser: userModel | null;
 };
 
-const NewUserForm = ({ handleClose }: Props) => {
+const NewUserForm = ({ handleClose, selectedUser, getAllUser }: Props) => {
   const {
     register,
     handleSubmit,
@@ -26,16 +29,30 @@ const NewUserForm = ({ handleClose }: Props) => {
   } = useForm<NewUserInputs>();
 
   const onSubmit: SubmitHandler<NewUserInputs> = async (data) => {
-    await window.Main.newUser(data).then((response) => {
-      if (response === 1) {
-        toast.warning('Usuario ya registrado');
-      } else if (response === 2) {
-        toast.success('Usuario registrado con éxito');
-        handleClose();
-      } else {
-        toast.error('Error al registrar usuario');
-      }
-    });
+    if (!selectedUser) {
+      await window.Main.newUser(data).then((response) => {
+        if (response === 1) {
+          toast.warning('Usuario ya registrado');
+        } else if (response === 2) {
+          toast.success('Usuario registrado con éxito');
+          handleClose();
+          getAllUser();
+        } else {
+          toast.error('Error al registrar usuario');
+        }
+      });
+    } else {
+      const IdSelectedUser = selectedUser?.Id;
+
+      await window.Main.updateUser(data, IdSelectedUser).then((response) => {
+        if (response === 2) {
+          toast.success('Usuario actualizado con éxito');
+          handleClose();
+        } else {
+          toast.error('Error al actualizar usuario');
+        }
+      });
+    }
   };
 
   return (
@@ -59,6 +76,7 @@ const NewUserForm = ({ handleClose }: Props) => {
                 {...register('InstitutionalCode', {
                   required: true,
                 })}
+                defaultValue={selectedUser?.InstitutionalCode}
               />
             </div>
           </Grid>
@@ -73,6 +91,7 @@ const NewUserForm = ({ handleClose }: Props) => {
                 {...register('FirstName', {
                   required: true,
                 })}
+                defaultValue={selectedUser?.FirstName}
               />
             </div>
           </Grid>
@@ -87,6 +106,7 @@ const NewUserForm = ({ handleClose }: Props) => {
                 {...register('FatherLastname', {
                   required: true,
                 })}
+                defaultValue={selectedUser?.FatherLastname}
               />
             </div>
           </Grid>
@@ -101,6 +121,7 @@ const NewUserForm = ({ handleClose }: Props) => {
                 {...register('MotherLastname', {
                   required: true,
                 })}
+                defaultValue={selectedUser?.MotherLastname}
               />
             </div>
           </Grid>
@@ -115,6 +136,7 @@ const NewUserForm = ({ handleClose }: Props) => {
                 {...register('InstitutionalEmail', {
                   required: true,
                 })}
+                defaultValue={selectedUser?.InstitutionalEmail}
               />
             </div>
           </Grid>
@@ -128,7 +150,13 @@ const NewUserForm = ({ handleClose }: Props) => {
                 })}
                 className="form-select"
                 aria-label="Default select example"
-                defaultValue={'DEFAULT'}
+                defaultValue={
+                  selectedUser
+                    ? selectedUser?.RoleType === 'Profesor'
+                      ? 1
+                      : 2
+                    : 'DEFAULT'
+                }
               >
                 <option value="DEFAULT" disabled>
                   Selecciona un rol

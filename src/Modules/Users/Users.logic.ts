@@ -97,10 +97,6 @@ const Users = () => {
     setPage(0);
   };
 
-  const handleUpdateUser = (data: any) => {
-    console.log(data);
-  };
-
   return {
     page,
     rowsPerPage,
@@ -111,7 +107,6 @@ const Users = () => {
     handleChangeRowsPerPage,
     requestSearch,
     cancelSearch,
-    handleUpdateUser,
     getAllUser,
   };
 };

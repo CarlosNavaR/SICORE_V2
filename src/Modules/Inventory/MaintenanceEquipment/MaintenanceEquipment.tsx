@@ -287,7 +287,10 @@ const Equipment = () => {
                 ></i>
               </IconButton>
             </Grid>
-            <NewMaintenanceForm handleClose={handleClose} />
+            <NewMaintenanceForm
+              handleClose={handleClose}
+              getAllMaintenanceEquipment={getAllMaintenanceEquipment}
+            />
           </div>
         </Box>
       </Modal>

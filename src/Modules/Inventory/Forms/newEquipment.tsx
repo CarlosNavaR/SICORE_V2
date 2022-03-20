@@ -188,8 +188,8 @@ const NewEquipmentForm = ({ handleClose, getAllEquipment }: Props) => {
                 <option value="DEFAULT" disabled>
                   Selecciona un tipo
                 </option>
-                <option value={1}>Único equipo</option>
-                <option value={2}>Multiples productos</option>
+                <option value="0">Multiples productos</option>
+                <option value="1">Único equipo</option>
               </select>
             </div>
           </Grid>

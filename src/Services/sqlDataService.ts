@@ -64,6 +64,34 @@ export const registerNewUser = async (data: any) => {
   }
 };
 
+export const updateUser = async (data: any, IdUser: number) => {
+  try {
+    //@ts-ignore
+
+    const sqlQuery =
+      'UPDATE User SET FirstName=?,FatherLastname=?,MotherLastname=?,InstitutionalCode=?,InstitutionalEmail=?,IdUserRole=? WHERE Id=?';
+    const [rows, fields] = await (
+      await connection
+    ).query(sqlQuery, [
+      data.FirstName,
+      data.FatherLastname,
+      data.MotherLastname,
+      data.InstitutionalCode,
+      data.InstitutionalEmail,
+      data.IdUserRole,
+      IdUser,
+    ]);
+
+    //@ts-ignore
+    if (rows.affectedRows > 0) {
+      return 2;
+    } else return 3;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 export const registerNewSystemUser = async (data: any) => {
   try {
     const userExist = await getSystemUserByInstitutionalCode(
@@ -197,7 +225,7 @@ export const getAllSystemUsers = async (): Promise<SystemUserModel> => {
 
 export const getAllEquipment = async (): Promise<displayEquipmentModel> => {
   const sqlQuery =
-    'SELECT `e`.`Id`, `e`.`IdEquipmentType`, `et`.`Name` `EquipmentTypeName`, `e`.`IdEquipmentQualityStatus`, `eqs`.`Name` `EquipmentQualityStatusName`, `e`.`SerialNumber`, `e`.`Description`, `e`.`Location`, `e`.`Code` FROM `Equipment` `e` INNER JOIN `EquipmentType` `et` ON `e`.`IdEquipmentType` = `et`.`Id` INNER JOIN `EquipmentQualityStatus` `eqs` ON `e`.`IdEquipmentQualityStatus` = `eqs`.`Id` WHERE `e`.`IsActive` = 1;';
+    'SELECT `e`.`Id`, `e`.`IdEquipmentType`, `et`.`Name` `EquipmentTypeName`, `e`.`IdEquipmentQualityStatus`, `eqs`.`Name` `EquipmentQualityStatusName`, `e`.`SerialNumber`, `e`.`Description`, `e`.`Location`, `e`.`Code` FROM `Equipment` `e` INNER JOIN `EquipmentType` `et` ON `e`.`IdEquipmentType` = `et`.`Id` INNER JOIN `EquipmentQualityStatus` `eqs` ON `e`.`IdEquipmentQualityStatus` = `eqs`.`Id` WHERE `e`.`IsActive` = 1  and  `e`.`Id` NOT IN(select IdEquipment from Mantenimiento);';
 
   const [result, fields] = await (
     await connection
@@ -257,7 +285,6 @@ export const registerNewEquipment = async (
   registerType: boolean,
   data: any
 ) => {
-  console.log('🚀 ~ file: sqlDataService.ts ~ line 260 ~ data', data);
   try {
     const equipmentExist = await getEquipmentByCode(data.Code);
 
@@ -267,19 +294,19 @@ export const registerNewEquipment = async (
     } else {
       if (registerType === true) {
         const sqlQuery =
-          'CALL `sicore`.`RegisterEquipment`(1, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?);';
+          'CALL `sicore`.`RegisterEquipment`(1, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0);';
         const [rows, fields] = await (
           await connection
         ).query(sqlQuery, [
           data.IdEquipmentType,
           data.IdEquipmentQualityStatus,
           data.SerialNumber,
-          data.Code,
           data.Description,
+          data.Code,
           data.Location,
+          data.IsUnique,
           data.Frecuencia,
           data.UltimoMant,
-          data.IsUnique,
         ]);
 
         //@ts-ignore

@@ -12,6 +12,7 @@ import {
   getAllEquipmentTypes,
   getAllEquipmentQualityStatus,
   registerNewEquipment,
+  updateUser,
 } from '../src/Services/sqlDataService';
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
@@ -84,6 +85,18 @@ ipcMain.handle('REGISTER_USER', async (event, data) => {
   return result;
 });
 
+ipcMain.handle('UPDATE_USER', async (event, data, IdUser) => {
+  const result = await updateUser(data, IdUser);
+
+  return result;
+});
+
+ipcMain.handle('DEACTIVATE_USER', async (event, data) => {
+  const result = await deactivateUser(data);
+
+  return result;
+});
+
 ipcMain.handle('REGISTER_SYSTEM_USER', async (event, data) => {
   const result = await registerNewSystemUser(data);
 
@@ -92,12 +105,6 @@ ipcMain.handle('REGISTER_SYSTEM_USER', async (event, data) => {
 
 ipcMain.handle('DEACTIVATE_SYSTEM_USER', async (event, data) => {
   const result = await deactivateSystemUser(data);
-
-  return result;
-});
-
-ipcMain.handle('DEACTIVATE_USER', async (event, data) => {
-  const result = await deactivateUser(data);
 
   return result;
 });

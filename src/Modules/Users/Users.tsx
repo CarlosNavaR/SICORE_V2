@@ -100,7 +100,6 @@ const Users = () => {
     requestSearch,
     handleChangePage,
     handleChangeRowsPerPage,
-    handleUpdateUser,
     getAllUser,
     page,
     rowsPerPage,
@@ -111,6 +110,7 @@ const Users = () => {
 
   const [selectedUser, setSelectedUser] = useState<userModel | null>(null);
   const [deleteUser, setDeleteUser] = useState(false);
+  const [updateUser, setUpdateUser] = useState(false);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -128,6 +128,7 @@ const Users = () => {
       toast.error('Error al eliminar usuario');
     }
   };
+
   return (
     <div>
       <Paper
@@ -217,7 +218,9 @@ const Users = () => {
                         <IconButton
                           aria-label="edit"
                           onClick={() => {
-                            handleUpdateUser(row);
+                            setSelectedUser(row);
+                            setUpdateUser(true);
+                            handleOpen();
                           }}
                         >
                           <i
@@ -317,7 +320,11 @@ const Users = () => {
                   ></i>
                 </IconButton>
               </Grid>
-              <NewUserForm handleClose={handleClose} />
+              <NewUserForm
+                handleClose={handleClose}
+                selectedUser={selectedUser}
+                getAllUser={getAllUser}
+              />
             </div>
           )}
         </Box>

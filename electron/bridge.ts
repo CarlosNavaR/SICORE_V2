@@ -18,6 +18,11 @@ export const api = {
     return result;
   },
 
+  updateUser: async (data: any, IdUser: number) => {
+    const result = await ipcRenderer.invoke('UPDATE_USER', data, IdUser);
+    return result;
+  },
+
   newSystemUser: async (data: any) => {
     const result = await ipcRenderer.invoke('REGISTER_SYSTEM_USER', data);
     return result;

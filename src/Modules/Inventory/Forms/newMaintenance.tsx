@@ -20,9 +20,13 @@ type NewMaintenanceEquipmentInputs = {
 
 type Props = {
   handleClose: () => void;
+  getAllMaintenanceEquipment: () => void;
 };
 
-const NewSystemUserForm = ({ handleClose }: Props) => {
+const NewSystemUserForm = ({
+  handleClose,
+  getAllMaintenanceEquipment,
+}: Props) => {
   const [equipmentType, setEquipmentType] = useState<EquipmentTypeModel[]>([]);
   const [equipmentQualityStatus, setEquipmentQualityStatus] = useState<
     EquipmentQualityStatusModel[]
@@ -55,6 +59,7 @@ const NewSystemUserForm = ({ handleClose }: Props) => {
         } else if (response === 2) {
           toast.success('Equipo registrado con éxito');
           handleClose();
+          getAllMaintenanceEquipment();
         } else {
           toast.error('Error al registrar Equipo');
         }
@@ -190,8 +195,8 @@ const NewSystemUserForm = ({ handleClose }: Props) => {
                 <option value="DEFAULT" disabled>
                   Selecciona un tipo
                 </option>
-                <option value={1}>Único equipo</option>
-                <option value={0}>Multiples productos</option>
+                <option value="0">Multiples productos</option>
+                <option value="1">Único equipo</option>
               </select>
             </div>
           </Grid>
