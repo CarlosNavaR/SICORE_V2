@@ -3,21 +3,28 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import { toast } from 'react-toastify';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { SystemUserModel } from '../../../models/SystemUserModel';
+
 type NewUserInputs = {
   InstitutionalCode: string;
   FirstName: string;
   FatherLastname: string;
   MotherLastname: string;
   Password: string;
-  IdUserRole: string;
+  IdSystemUserRole: string;
 };
 
 type Props = {
   handleClose: () => void;
   getAllSystemUser: () => void;
+  selectedUser: SystemUserModel | null;
 };
 
-const NewSystemUserForm = ({ handleClose, getAllSystemUser }: Props) => {
+const NewSystemUserForm = ({
+  handleClose,
+  getAllSystemUser,
+  selectedUser,
+}: Props) => {
   const {
     register,
     handleSubmit,
@@ -25,17 +32,33 @@ const NewSystemUserForm = ({ handleClose, getAllSystemUser }: Props) => {
   } = useForm<NewUserInputs>();
 
   const onSubmit: SubmitHandler<NewUserInputs> = async (data) => {
-    await window.Main.newSystemUser(data).then((response) => {
-      if (response === 1) {
-        toast.warning('Usuario ya registrado');
-      } else if (response === 2) {
-        toast.success('Usuario registrado con éxito');
-        getAllSystemUser();
-        handleClose();
-      } else {
-        toast.error('Error al registrar usuario');
-      }
-    });
+    if (!selectedUser) {
+      await window.Main.newSystemUser(data).then((response) => {
+        if (response === 1) {
+          toast.warning('Usuario ya registrado');
+        } else if (response === 2) {
+          toast.success('Usuario registrado con éxito');
+          getAllSystemUser();
+          handleClose();
+        } else {
+          toast.error('Error al registrar usuario');
+        }
+      });
+    } else {
+      const IdSelectedUser = selectedUser?.Id;
+
+      await window.Main.updateSystemUser(data, IdSelectedUser).then(
+        (response) => {
+          if (response === 2) {
+            toast.success('Usuario actualizado con éxito');
+            getAllSystemUser();
+            handleClose();
+          } else {
+            toast.error('Error al actualizar usuario');
+          }
+        }
+      );
+    }
   };
 
   return (
@@ -59,6 +82,7 @@ const NewSystemUserForm = ({ handleClose, getAllSystemUser }: Props) => {
                 {...register('InstitutionalCode', {
                   required: true,
                 })}
+                defaultValue={selectedUser?.InstitutionalCode}
               />
             </div>
           </Grid>
@@ -73,6 +97,7 @@ const NewSystemUserForm = ({ handleClose, getAllSystemUser }: Props) => {
                 {...register('FirstName', {
                   required: true,
                 })}
+                defaultValue={selectedUser?.FirstName}
               />
             </div>
           </Grid>
@@ -87,6 +112,7 @@ const NewSystemUserForm = ({ handleClose, getAllSystemUser }: Props) => {
                 {...register('FatherLastname', {
                   required: true,
                 })}
+                defaultValue={selectedUser?.FatherLastname}
               />
             </div>
           </Grid>
@@ -101,6 +127,7 @@ const NewSystemUserForm = ({ handleClose, getAllSystemUser }: Props) => {
                 {...register('MotherLastname', {
                   required: true,
                 })}
+                defaultValue={selectedUser?.MotherLastname}
               />
             </div>
           </Grid>
@@ -123,12 +150,18 @@ const NewSystemUserForm = ({ handleClose, getAllSystemUser }: Props) => {
             <div className="form-outline ">
               <label className="form-label">Tipo de usuario</label>
               <select
-                {...register('IdUserRole', {
+                {...register('IdSystemUserRole', {
                   required: true,
                 })}
                 className="form-select"
                 aria-label="Default select example"
-                defaultValue={'DEFAULT'}
+                defaultValue={
+                  selectedUser
+                    ? selectedUser?.RoleType === 'Administrador'
+                      ? 1
+                      : 2
+                    : 'DEFAULT'
+                }
               >
                 <option value="DEFAULT" disabled>
                   Selecciona un rol

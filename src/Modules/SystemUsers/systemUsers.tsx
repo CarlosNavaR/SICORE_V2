@@ -100,7 +100,6 @@ const SystemUsers = () => {
     requestSearch,
     handleChangePage,
     handleChangeRowsPerPage,
-    handleUpdateUser,
     getAllSystemUser,
     page,
     rowsPerPage,
@@ -114,7 +113,11 @@ const SystemUsers = () => {
   const [deleteUser, setDeleteUser] = useState(false);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedUser(null);
+    setDeleteUser(false);
+  };
 
   const handleDeleteUser = async (data: any) => {
     const result = await window.Main.deactivateSystemUser(data);
@@ -218,7 +221,8 @@ const SystemUsers = () => {
                         <IconButton
                           aria-label="edit"
                           onClick={() => {
-                            handleUpdateUser(row);
+                            setSelectedUser(row);
+                            handleOpen();
                           }}
                         >
                           <i
@@ -283,7 +287,6 @@ const SystemUsers = () => {
                   className="btn btn-secondary"
                   onClick={() => {
                     handleClose();
-                    setDeleteUser(false);
                   }}
                 >
                   Cancelar
@@ -293,7 +296,6 @@ const SystemUsers = () => {
                   className="btn btn-danger"
                   onClick={() => {
                     handleDeleteUser(selectedUser);
-                    setDeleteUser(false);
                   }}
                 >
                   Eliminar
@@ -321,6 +323,7 @@ const SystemUsers = () => {
               <NewSystemUserForm
                 handleClose={handleClose}
                 getAllSystemUser={getAllSystemUser}
+                selectedUser={selectedUser}
               />
             </div>
           )}

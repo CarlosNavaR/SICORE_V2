@@ -28,6 +28,11 @@ export const api = {
     return result;
   },
 
+  updateSystemUser: async (data: any, IdUser: number) => {
+    const result = await ipcRenderer.invoke('UPDATE_SYSTEM_USER', data, IdUser);
+    return result;
+  },
+
   deactivateSystemUser: async (data: any) => {
     const result = await ipcRenderer.invoke('DEACTIVATE_SYSTEM_USER', data);
     return result;

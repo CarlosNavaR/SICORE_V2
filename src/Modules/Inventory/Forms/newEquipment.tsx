@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { EquipmentTypeModel } from '../../../models/equipmentTypeModel';
 import { EquipmentQualityStatusModel } from '../../../models/equipmentQualityStatus';
+import { displayEquipmentModel } from '../../../models/displayEquipmentModel';
 
 type NewEquipmentInputs = {
   Code: string;
@@ -19,9 +20,14 @@ type NewEquipmentInputs = {
 type Props = {
   handleClose: () => void;
   getAllEquipment: () => void;
+  selectedEquipment: displayEquipmentModel | null;
 };
 
-const NewEquipmentForm = ({ handleClose, getAllEquipment }: Props) => {
+const NewEquipmentForm = ({
+  handleClose,
+  getAllEquipment,
+  selectedEquipment,
+}: Props) => {
   const [equipmentType, setEquipmentType] = useState<EquipmentTypeModel[]>([]);
   const [equipmentQualityStatus, setEquipmentQualityStatus] = useState<
     EquipmentQualityStatusModel[]
@@ -43,20 +49,39 @@ const NewEquipmentForm = ({ handleClose, getAllEquipment }: Props) => {
   }, []);
 
   const onSubmit: SubmitHandler<NewEquipmentInputs> = async (data) => {
-    const saveDataForm = data;
-    await window.Main.registerNewEquipment(false, saveDataForm).then(
-      (response) => {
-        if (response === 1) {
-          toast.warning('Equipo ya registrado');
-        } else if (response === 2) {
-          toast.success('Equipo registrado con éxito');
+    if (!selectedEquipment) {
+      const saveDataForm = data;
+      await window.Main.registerNewEquipment(false, saveDataForm).then(
+        (response) => {
+          if (response === 1) {
+            toast.warning('Equipo ya registrado');
+          } else if (response === 2) {
+            toast.success('Equipo registrado con éxito');
+            handleClose();
+            getAllEquipment();
+          } else {
+            toast.error('Error al registrar Equipo');
+          }
+        }
+      );
+    } else {
+      const IdEquipment = selectedEquipment.Id;
+      const IdMaintenance = 0;
+      await window.Main.updateEquipment(
+        false,
+        data,
+        IdEquipment,
+        IdMaintenance
+      ).then((response) => {
+        if (response === 2) {
+          toast.success('Equipo actualizado con éxito');
           handleClose();
           getAllEquipment();
         } else {
-          toast.error('Error al registrar Equipo');
+          toast.error('Error al actualizar equipo');
         }
-      }
-    );
+      });
+    }
   };
 
   return (
@@ -79,10 +104,26 @@ const NewEquipmentForm = ({ handleClose, getAllEquipment }: Props) => {
                 })}
                 className="form-select"
                 aria-label="Default select example"
-                defaultValue={'DEFAULT'}
+                defaultValue={
+                  selectedEquipment
+                    ? selectedEquipment.IdEquipmentType
+                    : 'DEFAULT'
+                }
               >
-                <option value="DEFAULT" disabled>
-                  Selecciona un tipo
+                <option
+                  value={
+                    selectedEquipment
+                      ? selectedEquipment.IdEquipmentType
+                      : 'DEFAULT'
+                  }
+                  key={
+                    selectedEquipment ? selectedEquipment.IdEquipmentType : ''
+                  }
+                  disabled
+                >
+                  {selectedEquipment
+                    ? selectedEquipment.EquipmentTypeName
+                    : 'Selecciona un tipo'}
                 </option>
                 {equipmentType.map(({ Id, Name }) => (
                   <option key={Id} value={Id}>
@@ -104,6 +145,7 @@ const NewEquipmentForm = ({ handleClose, getAllEquipment }: Props) => {
                 {...register('Code', {
                   required: true,
                 })}
+                defaultValue={selectedEquipment?.Code}
               />
             </div>
           </Grid>
@@ -118,6 +160,7 @@ const NewEquipmentForm = ({ handleClose, getAllEquipment }: Props) => {
                 {...register('SerialNumber', {
                   required: true,
                 })}
+                defaultValue={selectedEquipment?.SerialNumber}
               />
             </div>
           </Grid>
@@ -132,6 +175,7 @@ const NewEquipmentForm = ({ handleClose, getAllEquipment }: Props) => {
                 {...register('Location', {
                   required: true,
                 })}
+                defaultValue={selectedEquipment?.Location}
               />
             </div>
           </Grid>
@@ -146,6 +190,7 @@ const NewEquipmentForm = ({ handleClose, getAllEquipment }: Props) => {
                 {...register('Description', {
                   required: true,
                 })}
+                defaultValue={selectedEquipment?.Description}
               />
             </div>
           </Grid>
@@ -159,10 +204,28 @@ const NewEquipmentForm = ({ handleClose, getAllEquipment }: Props) => {
                 })}
                 className="form-select"
                 aria-label="Default select example"
-                defaultValue={'DEFAULT'}
+                defaultValue={
+                  selectedEquipment
+                    ? selectedEquipment.IdEquipmentQualityStatus
+                    : 'DEFAULT'
+                }
               >
-                <option value="DEFAULT" disabled>
-                  Selecciona un estado
+                <option
+                  value={
+                    selectedEquipment
+                      ? selectedEquipment.IdEquipmentQualityStatus
+                      : 'DEFAULT'
+                  }
+                  key={
+                    selectedEquipment
+                      ? selectedEquipment.IdEquipmentQualityStatus
+                      : ''
+                  }
+                  disabled
+                >
+                  {selectedEquipment
+                    ? selectedEquipment.EquipmentQualityStatusName
+                    : 'Selecciona un estado'}
                 </option>
                 {equipmentQualityStatus.map((response: any) => (
                   <option key={response.Id} value={response.Id}>
@@ -183,7 +246,9 @@ const NewEquipmentForm = ({ handleClose, getAllEquipment }: Props) => {
                 })}
                 className="form-select"
                 aria-label="Default select example"
-                defaultValue={'DEFAULT'}
+                defaultValue={
+                  selectedEquipment ? selectedEquipment.IsUnique : 'DEFAULT'
+                }
               >
                 <option value="DEFAULT" disabled>
                   Selecciona un tipo

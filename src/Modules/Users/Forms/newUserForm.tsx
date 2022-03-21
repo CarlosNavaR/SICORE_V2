@@ -47,6 +47,7 @@ const NewUserForm = ({ handleClose, selectedUser, getAllUser }: Props) => {
       await window.Main.updateUser(data, IdSelectedUser).then((response) => {
         if (response === 2) {
           toast.success('Usuario actualizado con éxito');
+          getAllUser();
           handleClose();
         } else {
           toast.error('Error al actualizar usuario');

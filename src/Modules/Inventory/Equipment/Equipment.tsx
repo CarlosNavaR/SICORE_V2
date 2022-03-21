@@ -19,6 +19,7 @@ import Styles from './equipment.module.css';
 import Logic from './Equipment.logic';
 import { displayEquipmentModel } from '../../../models/displayEquipmentModel';
 import NewEquipmentForm from '../Forms/newEquipment';
+import NewEquipmentTypeForm from '../Forms/newCategory';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -112,9 +113,28 @@ const Equipment = () => {
   const [selectedEquipment, setSelectedEquipment] =
     useState<displayEquipmentModel | null>(null);
   const [deleteEquipment, setDeleteEquipment] = useState(false);
+  const [newCategory, setNewCategory] = useState(false);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    setDeleteEquipment(false);
+    setSelectedEquipment(null);
+    setNewCategory(false);
+  };
+
+  const handleDeleteEquipment = async (data: any) => {
+    const result = await window.Main.deactivateEquipment(data.Id);
+
+    if (result === 2) {
+      toast.success('Equipo eliminado con éxito');
+      getAllEquipment();
+      handleClose();
+    } else {
+      toast.error('Error al eliminar Equipo');
+    }
+    setDeleteEquipment(false);
+  };
 
   return (
     <div>
@@ -129,17 +149,36 @@ const Equipment = () => {
       >
         <p className="fs-4 fw-bold mb-0 ">Inventario</p>
 
-        <Button
-          startIcon={
-            <i
-              className="fa-solid fa-folder-plus"
-              style={{ color: 'var(--blue)', fontSize: 14 }}
-            ></i>
-          }
-          onClick={handleOpen}
-        >
-          Nuevo equipo
-        </Button>
+        <div>
+          <Button
+            style={{ marginRight: 5 }}
+            startIcon={
+              <i
+                className="fa-solid fa-folder-plus"
+                style={{ color: 'var(--blue)', fontSize: 14 }}
+              ></i>
+            }
+            onClick={handleOpen}
+          >
+            Nuevo equipo
+          </Button>
+
+          <Button
+            variant="outlined"
+            startIcon={
+              <i
+                className="fa-solid fa-square-plus"
+                style={{ color: 'var(--blue)', fontSize: 14 }}
+              ></i>
+            }
+            onClick={() => {
+              setNewCategory(true);
+              handleOpen();
+            }}
+          >
+            Registrar categoría
+          </Button>
+        </div>
       </Paper>
 
       <Paper
@@ -205,7 +244,8 @@ const Equipment = () => {
                         <IconButton
                           aria-label="edit"
                           onClick={() => {
-                            handleUpdateEquipment(row);
+                            setSelectedEquipment(row);
+                            handleOpen();
                           }}
                         >
                           <i
@@ -261,28 +301,74 @@ const Equipment = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <div>
-            <Grid
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-              }}
-            >
-              <p className="fs-4 fw-bold" style={{ color: 'var(--blue)' }}>
-                Registrar equipo
-              </p>
-              <IconButton onClick={handleClose}>
-                <i
-                  className="fa-solid fa-xmark"
-                  style={{ color: 'var(--red)' }}
-                ></i>
-              </IconButton>
-            </Grid>
-            <NewEquipmentForm
-              handleClose={handleClose}
-              getAllEquipment={getAllEquipment}
-            />
-          </div>
+          {deleteEquipment ? (
+            <div>
+              <div className="modal-header flex-column">
+                <div className="icon-box">
+                  <i
+                    className="fa-solid fa-triangle-exclamation"
+                    style={{ fontSize: 30, color: 'red' }}
+                  ></i>
+                </div>
+              </div>
+              <div className="modal-body">
+                <p>
+                  Estas seguro que deseas eliminar este registro? Este proceso
+                  no puede ser revertido.
+                </p>
+              </div>
+              <div className="modal-footer justify-content-center">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    handleClose();
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={() => {
+                    handleDeleteEquipment(selectedEquipment);
+                  }}
+                >
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <Grid
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <p className="fs-4 fw-bold" style={{ color: 'var(--blue)' }}>
+                  {newCategory
+                    ? 'Registrar tipo de equipo'
+                    : 'Registrar equipo'}
+                </p>
+                <IconButton onClick={handleClose}>
+                  <i
+                    className="fa-solid fa-xmark"
+                    style={{ color: 'var(--red)' }}
+                  ></i>
+                </IconButton>
+              </Grid>
+              {newCategory ? (
+                <NewEquipmentTypeForm handleClose={handleClose} />
+              ) : (
+                <NewEquipmentForm
+                  handleClose={handleClose}
+                  getAllEquipment={getAllEquipment}
+                  selectedEquipment={selectedEquipment}
+                />
+              )}
+            </div>
+          )}
         </Box>
       </Modal>
     </div>

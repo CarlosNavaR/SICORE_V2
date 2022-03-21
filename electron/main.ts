@@ -13,6 +13,7 @@ import {
   getAllEquipmentQualityStatus,
   registerNewEquipment,
   updateUser,
+  updateSystemUser,
   updateEquipment,
   deactivateEquipment,
 } from '../src/Services/sqlDataService';
@@ -101,6 +102,12 @@ ipcMain.handle('DEACTIVATE_USER', async (event, data) => {
 
 ipcMain.handle('REGISTER_SYSTEM_USER', async (event, data) => {
   const result = await registerNewSystemUser(data);
+
+  return result;
+});
+
+ipcMain.handle('UPDATE_SYSTEM_USER', async (event, data, IdUser) => {
+  const result = await updateSystemUser(data, IdUser);
 
   return result;
 });

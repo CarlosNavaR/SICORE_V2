@@ -136,7 +136,7 @@ export const registerNewSystemUser = async (data: any) => {
         data.MotherLastname,
         data.InstitutionalCode,
         data.Password,
-        data.IdUserRole,
+        data.IdSystemUserRole,
       ]);
 
       //@ts-ignore
@@ -400,7 +400,7 @@ export const updateEquipment = async (
       } else return 3;
     } else {
       const sqlQuery =
-        'UPDATE Equipment SET IdEquipmentType=?, IdEquipmentQualityStatus=?, SerialNumber=?, Code=?, Description=?, Location=?;';
+        'UPDATE Equipment SET IdEquipmentType=?, IdEquipmentQualityStatus=?, SerialNumber=?, Code=?, Description=?, Location=? WHERE `Id`=?;';
       const [rows, fields] = await (
         await connection
       ).query(sqlQuery, [
@@ -411,6 +411,7 @@ export const updateEquipment = async (
         data.Description,
         data.Location,
         data.IsUnique,
+        IdEquipment,
       ]);
 
       //@ts-ignore
