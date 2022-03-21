@@ -66,7 +66,7 @@ const CustomTablePagination = styled(TablePaginationUnstyled)(
     width: 50px;
 
     &:hover {
-      background-color: #F3F6F9;
+      background-color: #f3f6f986;
     }
     &:focus {
       outline: 1px solid #A5D8FF;
@@ -122,9 +122,21 @@ const Equipment = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
+    setDeleteMaintenanceEquipment(false);
     setSelectedMaintenanceEquipment(null);
   };
-  const handleDeleteEquipment = async (data: any) => {};
+  const handleDeleteEquipment = async (data: any) => {
+    const result = await window.Main.deactivateEquipment(data.Id);
+
+    if (result === 2) {
+      toast.success('Equipo eliminado con éxito');
+      getAllMaintenanceEquipment();
+      handleClose();
+    } else {
+      toast.error('Error al eliminar Equipo');
+    }
+    setDeleteMaintenanceEquipment(false);
+  };
 
   return (
     <div>
@@ -139,17 +151,32 @@ const Equipment = () => {
       >
         <p className="fs-4 fw-bold mb-0 ">Mantenimiento</p>
 
-        <Button
-          startIcon={
-            <i
-              className="fa-solid fa-folder-plus"
-              style={{ color: 'var(--blue)', fontSize: 14 }}
-            ></i>
-          }
-          onClick={handleOpen}
-        >
-          Nuevo equipo
-        </Button>
+        <div>
+          <Button
+            style={{ marginRight: 5 }}
+            startIcon={
+              <i
+                className="fa-solid fa-folder-plus"
+                style={{ color: 'var(--blue)', fontSize: 14 }}
+              ></i>
+            }
+            onClick={handleOpen}
+          >
+            Nuevo equipo
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={
+              <i
+                className="fa-solid fa-screwdriver-wrench"
+                style={{ color: 'var(--blue)', fontSize: 14 }}
+              ></i>
+            }
+            onClick={() => {}}
+          >
+            Equipos en mantenimiento
+          </Button>
+        </div>
       </Paper>
       <Paper
         style={{ padding: '1rem', marginTop: '1.5rem' }}
@@ -186,13 +213,28 @@ const Equipment = () => {
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row) => {
                   return (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={row.Id}>
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      tabIndex={-1}
+                      key={row.Id}
+                      className={
+                        dayjs(new Date(row.ProximoMant))
+                          .format('YYYY-MM')
+                          .toString() ===
+                        dayjs(new Date()).format('YYYY-MM').toString()
+                          ? Styles.MaintenanceRow
+                          : ''
+                      }
+                    >
                       {columns.map((column) => {
                         const value = row[column.id];
                         return (
                           <TableCell key={column.id} align={column.align}>
-                            {column.formatDate
-                              ? dayjs(new Date(value + 'Z'))
+                            {column.formatFreq
+                              ? value + ' Mes(es)'
+                              : column.formatDate
+                              ? dayjs(new Date(value))
                                   .format('DD MMM, YYYY')
                                   .toString()
                               : column.format && typeof value === 'number'
@@ -209,6 +251,10 @@ const Equipment = () => {
                             setSelectedMaintenanceEquipment(row);
                             handleOpen();
                           }}
+                          style={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.295)',
+                            marginRight: 3,
+                          }}
                         >
                           <i
                             className="fa-solid fa-trash"
@@ -221,6 +267,10 @@ const Equipment = () => {
                             setSelectedMaintenanceEquipment(row);
                             handleOpen();
                           }}
+                          style={{
+                            marginRight: 3,
+                            backgroundColor: 'rgba(255, 255, 255, 0.295)',
+                          }}
                         >
                           <i
                             className="fa-solid fa-pencil"
@@ -231,6 +281,9 @@ const Equipment = () => {
                           aria-label="qr"
                           onClick={() => {
                             setSelectedMaintenanceEquipment(row);
+                          }}
+                          style={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.295)',
                           }}
                         >
                           <i
@@ -295,7 +348,6 @@ const Equipment = () => {
                   className="btn btn-secondary"
                   onClick={() => {
                     handleClose();
-                    setDeleteMaintenanceEquipment(false);
                   }}
                 >
                   Cancelar
@@ -305,7 +357,6 @@ const Equipment = () => {
                   className="btn btn-danger"
                   onClick={() => {
                     handleDeleteEquipment(selectedMaintenanceEquipment);
-                    setDeleteMaintenanceEquipment(false);
                   }}
                 >
                   Eliminar

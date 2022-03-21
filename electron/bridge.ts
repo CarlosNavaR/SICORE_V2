@@ -89,6 +89,11 @@ export const api = {
     return result;
   },
 
+  deactivateEquipment: (IdEquipment: number) => {
+    const result = ipcRenderer.invoke('Deactivate_Equipment', IdEquipment);
+    return result;
+  },
+
   /**
    * Provide an easier way to listen to events
    */

@@ -14,6 +14,7 @@ import {
   registerNewEquipment,
   updateUser,
   updateEquipment,
+  deactivateEquipment,
 } from '../src/Services/sqlDataService';
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
@@ -147,3 +148,8 @@ ipcMain.handle(
     return result;
   }
 );
+
+ipcMain.handle('Deactivate_Equipment', async (event, IdEquipment) => {
+  const result = await deactivateEquipment(IdEquipment);
+  return result;
+});

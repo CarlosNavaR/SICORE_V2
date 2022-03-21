@@ -115,6 +115,7 @@ const Users = () => {
   const handleClose = () => {
     setOpen(false);
     setSelectedUser(null);
+    setDeleteUser(false);
   };
 
   const handleDeleteUser = async (data: any) => {
@@ -129,6 +130,7 @@ const Users = () => {
     } else {
       toast.error('Error al eliminar usuario');
     }
+    setDeleteUser(false);
   };
 
   return (
@@ -286,7 +288,6 @@ const Users = () => {
                   className="btn btn-secondary"
                   onClick={() => {
                     handleClose();
-                    setDeleteUser(false);
                   }}
                 >
                   Cancelar
@@ -296,7 +297,6 @@ const Users = () => {
                   className="btn btn-danger"
                   onClick={() => {
                     handleDeleteUser(selectedUser);
-                    setDeleteUser(false);
                   }}
                 >
                   Eliminar

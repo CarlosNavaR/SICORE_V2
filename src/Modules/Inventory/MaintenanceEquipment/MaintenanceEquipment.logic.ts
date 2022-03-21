@@ -18,6 +18,7 @@ interface Column {
   align?: 'right';
   format?: (value: number) => string;
   formatDate?: (value: Date) => string;
+  formatFreq?: (value: number) => string;
 }
 
 const columns: readonly Column[] = [
@@ -32,7 +33,12 @@ const columns: readonly Column[] = [
   { id: 'EquipmentTypeName', label: 'Equipo', minWidth: 100 },
   { id: 'SerialNumber', label: 'Numero de serie', minWidth: 80 },
   { id: 'Description', label: 'Descripción', minWidth: 120 },
-  { id: 'Frecuencia', label: 'Frecuencia', minWidth: 80 },
+  {
+    id: 'Frecuencia',
+    label: 'Frecuencia',
+    minWidth: 80,
+    formatFreq: (value: number) => value.toString(),
+  },
   {
     id: 'UltimoMant',
     label: 'Ult. mantenimiento',
@@ -87,7 +93,7 @@ const Equipment = () => {
     window.Main.getAllMaintenanceEquipment()
       .then((result) => {
         console.log(
-          '🚀 ~ file: MaintenanceEquipment.logic.ts ~ line 82 ~ .then ~ result',
+          '🚀 ~ file: MaintenanceEquipment.logic.ts ~ line 89 ~ .then ~ result',
           result
         );
         setRows(result);

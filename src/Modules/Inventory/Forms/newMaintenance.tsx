@@ -40,10 +40,6 @@ const NewSystemUserForm = ({
     EquipmentQualityStatusModel[]
   >([]);
 
-  console.log(
-    '🚀 ~ file: newMaintenance.tsx ~ line 32 ~ selectedMaintenanceEquipment',
-    selectedMaintenanceEquipment
-  );
   const {
     register,
     handleSubmit,
@@ -65,6 +61,7 @@ const NewSystemUserForm = ({
   ) => {
     if (!selectedMaintenanceEquipment) {
       const saveDataForm = data;
+
       await window.Main.registerNewEquipment(true, saveDataForm).then(
         (response) => {
           if (response === 1) {
@@ -81,7 +78,6 @@ const NewSystemUserForm = ({
     } else {
       const IdEquipment = selectedMaintenanceEquipment.Id;
       const IdMaintenance = selectedMaintenanceEquipment.IdMaintenance;
-
       await window.Main.updateEquipment(
         true,
         data,
@@ -91,6 +87,7 @@ const NewSystemUserForm = ({
         if (response === 2) {
           toast.success('Equipo actualizado con éxito');
           handleClose();
+          getAllMaintenanceEquipment();
         } else {
           toast.error('Error al actualizar equipo');
         }
@@ -225,8 +222,22 @@ const NewSystemUserForm = ({
                     : 'DEFAULT'
                 }
               >
-                <option value="DEFAULT" disabled>
-                  Selecciona un estado
+                <option
+                  value={
+                    selectedMaintenanceEquipment
+                      ? selectedMaintenanceEquipment.IdEquipmentQualityStatus
+                      : 'DEFAULT'
+                  }
+                  key={
+                    selectedMaintenanceEquipment
+                      ? selectedMaintenanceEquipment.IdEquipmentQualityStatus
+                      : ''
+                  }
+                  disabled
+                >
+                  {selectedMaintenanceEquipment
+                    ? selectedMaintenanceEquipment.EquipmentQualityStatusName
+                    : 'Selecciona un estado'}
                 </option>
                 {equipmentQualityStatus.map((response: any) => (
                   <option key={response.Id} value={response.Id}>
@@ -292,7 +303,7 @@ const NewSystemUserForm = ({
                 defaultValue={
                   selectedMaintenanceEquipment
                     ? dayjs(
-                        new Date(selectedMaintenanceEquipment?.UltimoMant + 'Z')
+                        new Date(selectedMaintenanceEquipment?.UltimoMant)
                       ).format('YYYY-MM-DD')
                     : ''
                 }

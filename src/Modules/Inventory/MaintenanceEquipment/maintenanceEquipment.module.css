@@ -1,3 +1,15 @@
 .root th {
   background-color: #f3f6f9;
 }
+
+.MaintenanceRow {
+  background-color: rgba(255, 0, 0, 0.548);
+}
+
+.MaintenanceRow td {
+  color: #fff;
+}
+
+.MaintenanceRow:hover {
+  background-color: rgba(255, 0, 0, 0.548) !important;
+}

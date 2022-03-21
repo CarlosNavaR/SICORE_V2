@@ -377,7 +377,7 @@ export const updateEquipment = async (
   try {
     if (registerType === true) {
       const sqlQuery =
-        'CALL `sicore`.`UpdateEquipment`( ?, ?, ?, ?, ?, ?, ?, ?, ?,0);';
+        'CALL `sicore`.`UpdateEquipment`( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,0);';
       const [rows, fields] = await (
         await connection
       ).query(sqlQuery, [
@@ -422,4 +422,14 @@ export const updateEquipment = async (
     console.log(error);
     return false;
   }
+};
+
+export const deactivateEquipment = async (idEquipment: number) => {
+  const sqlQuery = 'UPDATE Equipment set IsActive = 0 WHERE Id=?';
+  const [rows, fields] = await (await connection).query(sqlQuery, idEquipment);
+
+  //@ts-ignore
+  if (rows.affectedRows > 0) {
+    return 2;
+  } else return 3;
 };
