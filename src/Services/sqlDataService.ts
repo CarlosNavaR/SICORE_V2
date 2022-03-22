@@ -438,7 +438,7 @@ export const deactivateEquipment = async (idEquipment: number) => {
 export const getAllEquipmentInMaintenance =
   async (): Promise<displayMaintenanceEquipmentModel> => {
     const sqlQuery =
-      'Select	`Equipment`.`Id`, `Equipment`.`SerialNumber`, `Equipment`.`IdEquipmentType`,`Equipment`.`IsUnique`, `ET`.`Name` `EquipmentTypeName`, `Equipment`.`Location`, `Equipment`.`IdEquipmentQualityStatus` , `eqs`.`Name` `EquipmentQualityStatusName`, `Equipment`.`Description`, `Equipment`.`Code`, `Mantenimiento`.`ID` `IdMaintenance`, `Mantenimiento`.`Frecuencia`, `Mantenimiento`.`UltimoMant`, `Mantenimiento`.`ProximoMant`, `Mantenimiento`.`EnMantenimiento` from `Equipment` inner join `Mantenimiento` on `Equipment`.`ID` = `Mantenimiento`.`IdEquipment` INNER JOIN `EquipmentType` `ET` ON `IdEquipmentType` = `ET`.`Id` INNER JOIN `EquipmentQualityStatus` `eqs` ON `Equipment`.`IdEquipmentQualityStatus` = `eqs`.`Id` where `Equipment`.`IsActive` = 1 and `Mantenimiento`.`EnMantenimiento` = 1 ORDER BY `Mantenimiento`.`ProximoMant`;';
+      'Select	`Equipment`.`Id`, `Equipment`.`SerialNumber`, `Equipment`.`IdEquipmentType`,`Equipment`.`IsUnique`, `ET`.`Name` `EquipmentTypeName`, `Equipment`.`Location`, `Equipment`.`IdEquipmentQualityStatus` , `eqs`.`Name` `EquipmentQualityStatusName`, `Equipment`.`Description`, `Equipment`.`Code`, `Mantenimiento`.`ID` `IdMaintenance`, `Mantenimiento`.`Frecuencia`, `Mantenimiento`.`UltimoMant`, `Mantenimiento`.`ProximoMant`, `Mantenimiento`.`EnMantenimiento` from `Equipment` inner join `Mantenimiento` on `Equipment`.`ID` = `Mantenimiento`.`IdEquipment` INNER JOIN `EquipmentType` `ET` ON `IdEquipmentType` = `ET`.`Id` INNER JOIN `EquipmentQualityStatus` `eqs` ON `Equipment`.`IdEquipmentQualityStatus` = `eqs`.`Id` where `Equipment`.`IsActive` = 0 and `Mantenimiento`.`EnMantenimiento` = 1 ORDER BY `Mantenimiento`.`ProximoMant`;';
 
     const [result, fields] = await (
       await connection
@@ -446,3 +446,52 @@ export const getAllEquipmentInMaintenance =
 
     return result;
   };
+
+export const putEquipmentInMaintenance = async (data: any) => {
+  const sqlChangeEquipment = 'UPDATE Equipment SET IsActive = 0 WHERE Id=?';
+  const sqlChangeMaintenance =
+    'UPDATE Mantenimiento SET EnMantenimiento = 1 WHERE Id=?';
+
+  const [result, fields] = await (
+    await connection
+  ).query(sqlChangeEquipment, data.Id);
+
+  //@ts-ignore
+  if (result.affectedRows > 0) {
+    const [result2, fields] = await (
+      await connection
+    ).query(sqlChangeMaintenance, data.IdMaintenance);
+
+    //@ts-ignore
+    if (result2.affectedRows > 0) return 2;
+  } else return 3;
+};
+
+export const putEquipmentInInventory = async (data: any) => {
+  const today = new Date();
+  const UMantenimiento =
+    today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+
+  const sqlQuery =
+    'CALL `sicore`.`UpdateEquipment`( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,0);';
+  const [rows, fields] = await (
+    await connection
+  ).query(sqlQuery, [
+    data.Id,
+    data.IdMaintenance,
+    data.IdEquipmentType,
+    data.IdEquipmentQualityStatus,
+    data.SerialNumber,
+    data.Description,
+    data.Code,
+    data.Location,
+    data.IsUnique,
+    data.Frecuencia,
+    UMantenimiento,
+  ]);
+
+  //@ts-ignore
+  if (rows.affectedRows > 0) {
+    return 2;
+  } else return 3;
+};

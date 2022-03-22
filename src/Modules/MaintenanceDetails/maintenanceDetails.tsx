@@ -122,6 +122,17 @@ const MaintenanceDetails = () => {
     setSelectedMaintenanceEquipment(null);
   };
 
+  const handlePutEquipmentInInventory = async (data: any) => {
+    const result = await window.Main.putEquipmentInInventory(data);
+
+    if (result === 2) {
+      toast.success('El equipo regreso al inventario con éxito');
+      getAllEquipmentInMaintenance();
+      handleClose();
+    } else {
+      toast.error('Error al procesar la petición');
+    }
+  };
   return (
     <div>
       <Paper
@@ -203,7 +214,7 @@ const MaintenanceDetails = () => {
                       })}
                       <TableCell>
                         <Button
-                          aria-label="delete"
+                          aria-label="putInventory"
                           onClick={() => {
                             setSelectedMaintenanceEquipment(row);
                             handleOpen();
@@ -214,8 +225,8 @@ const MaintenanceDetails = () => {
                           }}
                           startIcon={
                             <i
-                              className="fa-solid fa-trash"
-                              style={{ color: 'red', fontSize: 14 }}
+                              className="fa-solid fa-folder-minus"
+                              style={{ fontSize: 14 }}
                             ></i>
                           }
                         >
@@ -256,61 +267,42 @@ const MaintenanceDetails = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          {returnEquipment ? (
-            <div>
-              <div className="modal-header flex-column">
-                <div className="icon-box">
-                  <i
-                    className="fa-solid fa-triangle-exclamation"
-                    style={{ fontSize: 30, color: 'red' }}
-                  ></i>
-                </div>
-              </div>
-              <div className="modal-body">
-                <p>
-                  Estas seguro que deseas eliminar este registro? Este proceso
-                  no puede ser revertido.
-                </p>
-              </div>
-              <div className="modal-footer justify-content-center">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => {
-                    handleClose();
-                  }}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  onClick={() => {}}
-                >
-                  Eliminar
-                </button>
+          <div>
+            <div className="modal-header flex-column">
+              <div className="icon-box">
+                <i
+                  className="fa-solid fa-triangle-exclamation"
+                  style={{ fontSize: 30, color: 'red' }}
+                ></i>
               </div>
             </div>
-          ) : (
-            <div>
-              <Grid
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
+            <div className="modal-body">
+              <p>
+                Estas seguro que deseas liberar este registro? Este proceso no
+                puede ser revertido.
+              </p>
+            </div>
+            <div className="modal-footer justify-content-center">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => {
+                  handleClose();
                 }}
               >
-                <p className="fs-4 fw-bold" style={{ color: 'var(--blue)' }}>
-                  Registrar equipo
-                </p>
-                <IconButton onClick={handleClose}>
-                  <i
-                    className="fa-solid fa-xmark"
-                    style={{ color: 'var(--red)' }}
-                  ></i>
-                </IconButton>
-              </Grid>
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={() => {
+                  handlePutEquipmentInInventory(selectedMaintenanceEquipment);
+                }}
+              >
+                Aceptar
+              </button>
             </div>
-          )}
+          </div>
         </Box>
       </Modal>
     </div>

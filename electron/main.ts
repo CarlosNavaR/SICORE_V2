@@ -17,6 +17,8 @@ import {
   updateEquipment,
   deactivateEquipment,
   getAllEquipmentInMaintenance,
+  putEquipmentInMaintenance,
+  putEquipmentInInventory,
 } from '../src/Services/sqlDataService';
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
@@ -164,5 +166,15 @@ ipcMain.handle(
 
 ipcMain.handle('Deactivate_Equipment', async (event, IdEquipment) => {
   const result = await deactivateEquipment(IdEquipment);
+  return result;
+});
+
+ipcMain.handle('put_Equipment_In_Inventory', async (event, data) => {
+  const result = await putEquipmentInInventory(data);
+  return result;
+});
+
+ipcMain.handle('put_Equipment_In_Maintenance', async (event, data) => {
+  const result = await putEquipmentInMaintenance(data);
   return result;
 });

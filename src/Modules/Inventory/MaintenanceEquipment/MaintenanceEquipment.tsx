@@ -119,13 +119,16 @@ const Equipment = () => {
     useState<displayMaintenanceEquipmentModel | null>(null);
   const [deleteMaintenanceEquipment, setDeleteMaintenanceEquipment] =
     useState(false);
+  const [putMaintenanceEquipment, setputMaintenanceEquipment] = useState(false);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
     setDeleteMaintenanceEquipment(false);
     setSelectedMaintenanceEquipment(null);
+    setputMaintenanceEquipment(false);
   };
+
   const handleDeleteEquipment = async (data: any) => {
     const result = await window.Main.deactivateEquipment(data.Id);
 
@@ -139,6 +142,18 @@ const Equipment = () => {
     setDeleteMaintenanceEquipment(false);
   };
 
+  const handlePutEquipmentInMaintenance = async (data: any) => {
+    const result = await window.Main.putEquipmentInMaintenance(data);
+
+    if (result === 2) {
+      toast.success('Equipo puesto en mantenimiento con éxito');
+      getAllMaintenanceEquipment();
+      handleClose();
+    } else {
+      toast.error('Error al procesar la petición');
+    }
+    setputMaintenanceEquipment(false);
+  };
   return (
     <div>
       <Paper
@@ -281,9 +296,11 @@ const Equipment = () => {
                           ></i>
                         </IconButton>
                         <IconButton
-                          aria-label="qr"
+                          aria-label="putInMaintenance"
                           onClick={() => {
                             setSelectedMaintenanceEquipment(row);
+                            setputMaintenanceEquipment(true);
+                            handleOpen();
                           }}
                           style={{
                             backgroundColor: 'rgba(255, 255, 255, 0.295)',
@@ -329,7 +346,45 @@ const Equipment = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          {deleteMaintenanceEquipment ? (
+          {putMaintenanceEquipment ? (
+            <div>
+              <div className="modal-header flex-column">
+                <div className="icon-box">
+                  <i
+                    className="fa-solid fa-triangle-exclamation"
+                    style={{ fontSize: 30, color: 'red' }}
+                  ></i>
+                </div>
+              </div>
+              <div className="modal-body">
+                <p style={{ textAlign: 'center' }}>
+                  Estas seguro que deseas poner en mantenimiento este registro?
+                </p>
+              </div>
+              <div className="modal-footer justify-content-center">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    handleClose();
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={() => {
+                    handlePutEquipmentInMaintenance(
+                      selectedMaintenanceEquipment
+                    );
+                  }}
+                >
+                  Aceptar
+                </button>
+              </div>
+            </div>
+          ) : deleteMaintenanceEquipment ? (
             <div>
               <div className="modal-header flex-column">
                 <div className="icon-box">

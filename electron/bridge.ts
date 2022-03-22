@@ -104,6 +104,16 @@ export const api = {
     return result;
   },
 
+  putEquipmentInInventory: (data: any) => {
+    const result = ipcRenderer.invoke('put_Equipment_In_Inventory', data);
+    return result;
+  },
+
+  putEquipmentInMaintenance: (data: any) => {
+    const result = ipcRenderer.invoke('put_Equipment_In_Maintenance', data);
+    return result;
+  },
+
   /**
    * Provide an easier way to listen to events
    */
