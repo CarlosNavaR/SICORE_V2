@@ -434,3 +434,15 @@ export const deactivateEquipment = async (idEquipment: number) => {
     return 2;
   } else return 3;
 };
+
+export const getAllEquipmentInMaintenance =
+  async (): Promise<displayMaintenanceEquipmentModel> => {
+    const sqlQuery =
+      'Select	`Equipment`.`Id`, `Equipment`.`SerialNumber`, `Equipment`.`IdEquipmentType`,`Equipment`.`IsUnique`, `ET`.`Name` `EquipmentTypeName`, `Equipment`.`Location`, `Equipment`.`IdEquipmentQualityStatus` , `eqs`.`Name` `EquipmentQualityStatusName`, `Equipment`.`Description`, `Equipment`.`Code`, `Mantenimiento`.`ID` `IdMaintenance`, `Mantenimiento`.`Frecuencia`, `Mantenimiento`.`UltimoMant`, `Mantenimiento`.`ProximoMant`, `Mantenimiento`.`EnMantenimiento` from `Equipment` inner join `Mantenimiento` on `Equipment`.`ID` = `Mantenimiento`.`IdEquipment` INNER JOIN `EquipmentType` `ET` ON `IdEquipmentType` = `ET`.`Id` INNER JOIN `EquipmentQualityStatus` `eqs` ON `Equipment`.`IdEquipmentQualityStatus` = `eqs`.`Id` where `Equipment`.`IsActive` = 1 and `Mantenimiento`.`EnMantenimiento` = 1 ORDER BY `Mantenimiento`.`ProximoMant`;';
+
+    const [result, fields] = await (
+      await connection
+    ).query<displayMaintenanceEquipmentModel & RowDataPacket[][]>(sqlQuery);
+
+    return result;
+  };

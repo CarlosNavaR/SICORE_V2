@@ -63,6 +63,11 @@ export const api = {
     return Equipment;
   },
 
+  getAllEquipmentInMaintenance: () => {
+    const Equipment = ipcRenderer.invoke('Get_all_equipment_in_maintenance');
+    return Equipment;
+  },
+
   getAllEquipmentTypes: () => {
     const EquipmentTypes = ipcRenderer.invoke('Get_All_EquipmentTypes');
     return EquipmentTypes;

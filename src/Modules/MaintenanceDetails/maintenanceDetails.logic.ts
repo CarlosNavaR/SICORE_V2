@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { displayMaintenanceEquipmentModel } from '../../../models/displayMaintenanceEquipmentModel';
+import { displayMaintenanceEquipmentModel } from '../../models/displayMaintenanceEquipmentModel';
 
 interface Column {
   id:
@@ -54,7 +54,7 @@ const columns: readonly Column[] = [
   { id: 'EquipmentQualityStatusName', label: 'Estado', minWidth: 70 },
 ];
 
-const Equipment = () => {
+const MaintenanceEquipmentDetails = () => {
   const [rows, setRows] = useState<Array<displayMaintenanceEquipmentModel>>([]);
   const [rowsSearch, setRowsSearch] = useState<
     Array<displayMaintenanceEquipmentModel>
@@ -89,9 +89,13 @@ const Equipment = () => {
     requestSearch(searched);
   };
 
-  const getAllMaintenanceEquipment = () => {
-    window.Main.getAllMaintenanceEquipment()
+  const getAllEquipmentInMaintenance = () => {
+    window.Main.getAllEquipmentInMaintenance()
       .then((result) => {
+        console.log(
+          '🚀 ~ file: MaintenanceEquipment.logic.ts ~ line 89 ~ .then ~ result',
+          result
+        );
         setRows(result);
         setRowsSearch(result);
       })
@@ -102,7 +106,7 @@ const Equipment = () => {
 
   // its used for load data in first instance
   useEffect(() => {
-    getAllMaintenanceEquipment();
+    getAllEquipmentInMaintenance();
   }, []);
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -131,8 +135,8 @@ const Equipment = () => {
     requestSearch,
     cancelSearch,
     handleUpdateEquipment,
-    getAllMaintenanceEquipment,
+    getAllEquipmentInMaintenance,
   };
 };
 
-export default Equipment;
+export default MaintenanceEquipmentDetails;

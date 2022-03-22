@@ -19,12 +19,9 @@ import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import { toast } from 'react-toastify';
 import Grid from '@mui/material/Grid';
-import Styles from './maintenanceEquipment.module.css';
-import Logic from './MaintenanceEquipment.logic';
-import { displayMaintenanceEquipmentModel } from '../../../models/displayMaintenanceEquipmentModel';
-import NewMaintenanceForm from '../Forms/newMaintenance';
-
-dayjs.extend(relativeTime).locale('es');
+import Styles from './maintenanceDetails.module.css';
+import Logic from './maintenanceDetails.logic';
+import { displayMaintenanceEquipmentModel } from '../../models/displayMaintenanceEquipmentModel';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -101,13 +98,13 @@ const CustomTablePagination = styled(TablePaginationUnstyled)(
   `
 );
 
-const Equipment = () => {
+const MaintenanceDetails = () => {
   const {
     requestSearch,
     handleChangePage,
     handleChangeRowsPerPage,
     handleUpdateEquipment,
-    getAllMaintenanceEquipment,
+    getAllEquipmentInMaintenance,
     page,
     rowsPerPage,
     columns,
@@ -117,26 +114,12 @@ const Equipment = () => {
 
   const [selectedMaintenanceEquipment, setSelectedMaintenanceEquipment] =
     useState<displayMaintenanceEquipmentModel | null>(null);
-  const [deleteMaintenanceEquipment, setDeleteMaintenanceEquipment] =
-    useState(false);
+  const [returnEquipment, setReturnEquipment] = useState(false);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
-    setDeleteMaintenanceEquipment(false);
     setSelectedMaintenanceEquipment(null);
-  };
-  const handleDeleteEquipment = async (data: any) => {
-    const result = await window.Main.deactivateEquipment(data.Id);
-
-    if (result === 2) {
-      toast.success('Equipo eliminado con éxito');
-      getAllMaintenanceEquipment();
-      handleClose();
-    } else {
-      toast.error('Error al eliminar Equipo');
-    }
-    setDeleteMaintenanceEquipment(false);
   };
 
   return (
@@ -150,37 +133,9 @@ const Equipment = () => {
         }}
         className="align-middle"
       >
-        <p className="fs-4 fw-bold mb-0 ">Mantenimiento</p>
-
-        <div>
-          <Button
-            style={{ marginRight: 5 }}
-            startIcon={
-              <i
-                className="fa-solid fa-folder-plus"
-                style={{ color: 'var(--blue)', fontSize: 14 }}
-              ></i>
-            }
-            onClick={handleOpen}
-          >
-            Nuevo equipo
-          </Button>
-
-          <Button
-            variant="outlined"
-            startIcon={
-              <i
-                className="fa-solid fa-screwdriver-wrench"
-                style={{ color: 'var(--blue)', fontSize: 14 }}
-              ></i>
-            }
-          >
-            <Link to="/maintenance/details" style={{ textDecoration: 'none' }}>
-              Equipos en mantenimiento
-            </Link>
-          </Button>
-        </div>
+        <p className="fs-4 fw-bold mb-0 ">Equipos en mantenimiento</p>
       </Paper>
+
       <Paper
         style={{ padding: '1rem', marginTop: '1.5rem' }}
         className={Styles.root}
@@ -247,10 +202,9 @@ const Equipment = () => {
                         );
                       })}
                       <TableCell>
-                        <IconButton
+                        <Button
                           aria-label="delete"
                           onClick={() => {
-                            setDeleteMaintenanceEquipment(true);
                             setSelectedMaintenanceEquipment(row);
                             handleOpen();
                           }}
@@ -258,42 +212,15 @@ const Equipment = () => {
                             backgroundColor: 'rgba(255, 255, 255, 0.295)',
                             marginRight: 3,
                           }}
+                          startIcon={
+                            <i
+                              className="fa-solid fa-trash"
+                              style={{ color: 'red', fontSize: 14 }}
+                            ></i>
+                          }
                         >
-                          <i
-                            className="fa-solid fa-trash"
-                            style={{ color: 'red', fontSize: 14 }}
-                          ></i>
-                        </IconButton>
-                        <IconButton
-                          aria-label="edit"
-                          onClick={() => {
-                            setSelectedMaintenanceEquipment(row);
-                            handleOpen();
-                          }}
-                          style={{
-                            marginRight: 3,
-                            backgroundColor: 'rgba(255, 255, 255, 0.295)',
-                          }}
-                        >
-                          <i
-                            className="fa-solid fa-pencil"
-                            style={{ color: 'var(--blue)', fontSize: 14 }}
-                          ></i>
-                        </IconButton>
-                        <IconButton
-                          aria-label="qr"
-                          onClick={() => {
-                            setSelectedMaintenanceEquipment(row);
-                          }}
-                          style={{
-                            backgroundColor: 'rgba(255, 255, 255, 0.295)',
-                          }}
-                        >
-                          <i
-                            className="fa-solid fa-screwdriver-wrench"
-                            style={{ color: 'black', fontSize: 14 }}
-                          ></i>
-                        </IconButton>
+                          Liberar
+                        </Button>
                       </TableCell>
                     </TableRow>
                   );
@@ -329,7 +256,7 @@ const Equipment = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          {deleteMaintenanceEquipment ? (
+          {returnEquipment ? (
             <div>
               <div className="modal-header flex-column">
                 <div className="icon-box">
@@ -358,9 +285,7 @@ const Equipment = () => {
                 <button
                   type="button"
                   className="btn btn-danger"
-                  onClick={() => {
-                    handleDeleteEquipment(selectedMaintenanceEquipment);
-                  }}
+                  onClick={() => {}}
                 >
                   Eliminar
                 </button>
@@ -384,11 +309,6 @@ const Equipment = () => {
                   ></i>
                 </IconButton>
               </Grid>
-              <NewMaintenanceForm
-                handleClose={handleClose}
-                getAllMaintenanceEquipment={getAllMaintenanceEquipment}
-                selectedMaintenanceEquipment={selectedMaintenanceEquipment}
-              />
             </div>
           )}
         </Box>
@@ -397,4 +317,4 @@ const Equipment = () => {
   );
 };
 
-export default Equipment;
+export default MaintenanceDetails;

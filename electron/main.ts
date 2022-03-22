@@ -16,6 +16,7 @@ import {
   updateSystemUser,
   updateEquipment,
   deactivateEquipment,
+  getAllEquipmentInMaintenance,
 } from '../src/Services/sqlDataService';
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
@@ -125,6 +126,11 @@ ipcMain.handle('Get_all_equipment', async () => {
 
 ipcMain.handle('Get_all_maintenance_equipment', async () => {
   const result = await getAllMaintenanceEquipment();
+  return result;
+});
+
+ipcMain.handle('Get_all_equipment_in_maintenance', async () => {
+  const result = await getAllEquipmentInMaintenance();
   return result;
 });
 
