@@ -19,6 +19,7 @@ import {
   getAllEquipmentInMaintenance,
   putEquipmentInMaintenance,
   putEquipmentInInventory,
+  getAllEquipmentLoans,
 } from '../src/Services/sqlDataService';
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
@@ -176,5 +177,10 @@ ipcMain.handle('put_Equipment_In_Inventory', async (event, data) => {
 
 ipcMain.handle('put_Equipment_In_Maintenance', async (event, data) => {
   const result = await putEquipmentInMaintenance(data);
+  return result;
+});
+
+ipcMain.handle('Get_All_EquipmentLoans', async () => {
+  const result = await getAllEquipmentLoans();
   return result;
 });

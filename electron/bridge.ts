@@ -114,6 +114,11 @@ export const api = {
     return result;
   },
 
+  getAllEquipmentLoans: () => {
+    const EquipmentTypes = ipcRenderer.invoke('Get_All_EquipmentLoans');
+    return EquipmentTypes;
+  },
+
   /**
    * Provide an easier way to listen to events
    */

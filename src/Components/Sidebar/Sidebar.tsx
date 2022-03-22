@@ -84,22 +84,22 @@ const Sidebar = () => {
             <i className="fa-solid fa-users me-3"></i>
             Usuarios
           </Link>
-          {auth?.IdRole !== 1 ? (
-            ''
-          ) : (
-            <li className="nav-item mb-1">
-              <Link
-                to="SystemUsers"
-                className={`nav-link  ${
-                  location.hash === '#/SystemUsers' ? 'active' : 'text-dark'
-                }`}
-              >
-                <i className="fa-solid fa-user-lock me-3"></i>
-                Usuarios de sistema
-              </Link>
-            </li>
-          )}
         </li>
+        {auth?.IdRole !== 1 ? (
+          ''
+        ) : (
+          <li className="nav-item mb-1">
+            <Link
+              to="SystemUsers"
+              className={`nav-link  ${
+                location.hash === '#/SystemUsers' ? 'active' : 'text-dark'
+              }`}
+            >
+              <i className="fa-solid fa-user-lock me-3"></i>
+              Usuarios de sistema
+            </Link>
+          </li>
+        )}
         {auth?.IdRole !== 1 ? (
           ''
         ) : (

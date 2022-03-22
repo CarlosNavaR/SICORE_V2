@@ -8,6 +8,7 @@ import { displayMaintenanceEquipmentModel } from '../models/displayMaintenanceEq
 import { EquipmentTypeModel } from '../models/equipmentTypeModel';
 import { EquipmentQualityStatusModel } from '../models/equipmentQualityStatus';
 import { EquipmentModel } from '../models/EquipmentModel';
+import { displayEquipmentLoanModel } from '../models/displayEquipmentLoanModel';
 
 const connection = db.dbConnection();
 
@@ -495,3 +496,15 @@ export const putEquipmentInInventory = async (data: any) => {
     return 2;
   } else return 3;
 };
+
+export const getAllEquipmentLoans =
+  async (): Promise<displayEquipmentLoanModel> => {
+    const sqlQuery =
+      'SELECT `equipmentloan`.`Id` as `IdLoan`,	`user`.`Id` as `IdUser`, `user`.`FirstName`, `user`.`FatherLastname`, `user`.`MotherLastname`, `user`.`EnrollmentDate`, `user`.`InstitutionalCode`, `equipmentloan`.`LendDateTime`, `equipmentloan`.`IsActive`FROM `equipmentloan`INNER JOIN `user` ON `equipmentloan`.`IdUser` = `User`.`Id`WHERE `equipmentloan`.`IsActive` = 1;';
+
+    const [result, fields] = await (
+      await connection
+    ).query<displayEquipmentLoanModel & RowDataPacket[][]>(sqlQuery);
+
+    return result;
+  };
