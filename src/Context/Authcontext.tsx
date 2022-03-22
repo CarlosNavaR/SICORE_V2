@@ -49,7 +49,7 @@ const AuthProvider = ({ children }: Props) => {
       const authStr = JSON.stringify(authData);
       await localStorage.setItem('auth', authStr);
 
-      const origin = location.state?.from?.pathname || '/home';
+      const origin = location.state?.from?.pathname || '/loans';
       navigate(origin);
     } catch (error: any) {
       return error;

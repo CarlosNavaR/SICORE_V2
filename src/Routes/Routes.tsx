@@ -6,7 +6,7 @@ import Home from '_/Modules/Home/home';
 export default function Router() {
   return (
     <Routes>
-      <Route path="/home" element={<Home />} />
+      <Route path="/loans" element={<Home />} />
     </Routes>
   );
 }

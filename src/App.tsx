@@ -16,6 +16,7 @@ import Layout from './Components/Layout/Layout';
 import Inventory from './Modules/Inventory/Inventory';
 import Maintenance from './Modules/Inventory/MaintenanceEquipment/MaintenanceEquipment';
 import MaintenanceDetails from './Modules/MaintenanceDetails/maintenanceDetails';
+
 export function App() {
   return (
     <div>
@@ -27,10 +28,18 @@ export function App() {
               <Route index element={<Login />} />
               <Route path="/login" element={<Login />} />
               <Route
-                path="/home"
+                path="/loans"
                 element={
                   <PrivateRoute>
                     <Home />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/loans/details/:id?"
+                element={
+                  <PrivateRoute>
+                    <SystemUsers />
                   </PrivateRoute>
                 }
               />
@@ -55,22 +64,6 @@ export function App() {
                 element={
                   <PrivateRoute>
                     <MaintenanceDetails />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/loans"
-                element={
-                  <PrivateRoute>
-                    <SystemUsers />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/loans/details/:id?"
-                element={
-                  <PrivateRoute>
-                    <SystemUsers />
                   </PrivateRoute>
                 }
               />

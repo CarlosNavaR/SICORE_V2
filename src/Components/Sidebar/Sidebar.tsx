@@ -44,7 +44,7 @@ const Sidebar = () => {
           <Link
             to="loans"
             className={`nav-link  ${
-              location.hash === '#/home' ? 'active' : 'text-dark'
+              location.hash === '#/loans' ? 'active' : 'text-dark'
             }`}
             aria-current="page"
           >
