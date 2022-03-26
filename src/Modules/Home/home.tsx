@@ -19,6 +19,8 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { toast } from 'react-toastify';
 import Grid from '@mui/material/Grid';
 import Styles from './home.module.css';
+import NewLoanForm from './forms/newLoan';
+
 import Logic from './home.logic';
 dayjs.extend(relativeTime).locale('es');
 
@@ -27,7 +29,7 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 700,
+  width: 800,
   bgcolor: 'background.paper',
   boxShadow: 24,
   borderRadius: 1,
@@ -200,17 +202,19 @@ const Home = () => {
                         );
                       })}
                       <TableCell>
-                        <IconButton
-                          aria-label="qr"
-                          onClick={() => {
-                            handleOpen();
-                          }}
+                        <Button
+                          aria-label="Details"
+                          onClick={() => {}}
+                          style={{ fontSize: 12 }}
+                          startIcon={
+                            <i
+                              className="fa-solid fa-eye"
+                              style={{ color: 'var(--blue)', fontSize: 12 }}
+                            ></i>
+                          }
                         >
-                          <i
-                            className="fa-solid fa-qrcode"
-                            style={{ color: 'black', fontSize: 14 }}
-                          ></i>
-                        </IconButton>
+                          Ver detalles
+                        </Button>
                       </TableCell>
                     </TableRow>
                   );
@@ -263,11 +267,10 @@ const Home = () => {
                 ></i>
               </IconButton>
             </Grid>
-            {/* <NewEquipmentForm
+            <NewLoanForm
               handleClose={handleClose}
-              getAllEquipment={getAllEquipment}
-              selectedEquipment={selectedEquipment}
-            /> */}
+              getAllEquipmentLoans={getAllEquipmentLoans}
+            />
           </div>
         </Box>
       </Modal>

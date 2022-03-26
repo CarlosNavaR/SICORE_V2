@@ -20,6 +20,9 @@ import {
   putEquipmentInMaintenance,
   putEquipmentInInventory,
   getAllEquipmentLoans,
+  getEquipmentByCode,
+  getEquipmentByCodeForLoan,
+  newEquipmentLoan,
 } from '../src/Services/sqlDataService';
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
@@ -182,5 +185,23 @@ ipcMain.handle('put_Equipment_In_Maintenance', async (event, data) => {
 
 ipcMain.handle('Get_All_EquipmentLoans', async () => {
   const result = await getAllEquipmentLoans();
+  return result;
+});
+
+ipcMain.handle('Get_Loan_Equipment_By_Code', async (event, Code) => {
+  const result = await getEquipmentByCodeForLoan(Code);
+
+  return result;
+});
+
+ipcMain.handle('Get_Equipment_By_Code', async (event, Code) => {
+  const result = await getEquipmentByCode(Code);
+
+  return result;
+});
+
+ipcMain.handle('New_Equipment_Loan', async (event, InstitutionalCode, data) => {
+  const result = await newEquipmentLoan(InstitutionalCode, data);
+
   return result;
 });

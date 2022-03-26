@@ -209,11 +209,11 @@ export const getUserByInstitutionalCode = async (
   institutionalCode: string
 ): Promise<userModel> => {
   const sqlQuery =
-    'SELECT * FROM user WHERE InstitutionalCode=? AND isActive=1';
+    'SELECT * FROM user WHERE InstitutionalCode= ? AND isActive=1';
 
   const [result, fields] = await (
     await connection
-  ).query<userModel & RowDataPacket[][]>(sqlQuery, [institutionalCode]);
+  ).query<userModel & RowDataPacket[][]>(sqlQuery, institutionalCode);
 
   return result;
 };
@@ -263,6 +263,32 @@ export const getAllEquipment = async (): Promise<displayEquipmentModel> => {
   return result;
 };
 
+export const getEquipmentByCode = async (
+  code: any
+): Promise<displayEquipmentModel> => {
+  const sqlQuery =
+    'SELECT `Equipment`.`Id`,`Equipment`.`IdEquipmentType`,`EquipmentType`.`Name` `EquipmentTypeName`,`Equipment`.`IdEquipmentQualityStatus`,`Equipment`.`IsUnique`,`EquipmentQualityStatus`.`Name` `EquipmentQualityStatusName`,`Equipment`.`SerialNumber`,`Equipment`.`Description`,`Equipment`.`Location`,`Equipment`.`Code` FROM `Equipment` INNER JOIN `EquipmentType` ON `Equipment`.`IdEquipmentType` =`EquipmentType`.`Id` INNER JOIN `EquipmentQualityStatus` ON `Equipment`.`IdEquipmentQualityStatus` =`EquipmentQualityStatus`.`Id` WHERE `Equipment`.`IsActive`=1 and `Equipment`.`Id` NOT IN(select IdEquipment from Mantenimiento) and `Equipment`.Code=?;';
+
+  const [result, fields] = await (
+    await connection
+  ).query<displayEquipmentModel & RowDataPacket[][]>(sqlQuery, [code]);
+
+  return result;
+};
+
+export const getEquipmentByCodeForLoan = async (
+  code: any
+): Promise<displayEquipmentModel> => {
+  const sqlQuery =
+    'SELECT `Equipment`.`Id`,`Equipment`.`IdEquipmentType`,`EquipmentType`.`Name` `EquipmentTypeName`,`Equipment`.`IdEquipmentQualityStatus`,`Equipment`.`IsUnique`,`EquipmentQualityStatus`.`Name` `EquipmentQualityStatusName`,`Equipment`.`SerialNumber`,`Equipment`.`Description`,`Equipment`.`Location`,`Equipment`.`Code` FROM `Equipment` INNER JOIN `EquipmentType` ON`Equipment`.`IdEquipmentType` =`EquipmentType`.`Id` INNER JOIN `EquipmentQualityStatus`ON`Equipment`.`IdEquipmentQualityStatus` =`EquipmentQualityStatus`.`Id`INNER JOIN `equipmentloandetail`ON`Equipment`.`Id` =`equipmentloandetail`.`IdEquipment`INNER JOIN `equipmentloan`ON `equipmentloandetail`.`IdEquipmentLoan` =`equipmentloan`.`Id`WHERE `Equipment`.`IsActive` =1 and `Equipment`.`Code`=?  and `Equipment`.`Id` NOT IN(select IdEquipment from Mantenimiento) AND  `Equipment`.`Id` NOT IN (Select Id from Equipment where `Equipment`.`IsUnique` = 0) AND  `equipmentloan`.`IsActive`=1;';
+
+  const [result, fields] = await (
+    await connection
+  ).query<displayEquipmentModel & RowDataPacket[][]>(sqlQuery, [code]);
+
+  return result;
+};
+
 export const getAllMaintenanceEquipment =
   async (): Promise<displayMaintenanceEquipmentModel> => {
     const sqlQuery =
@@ -298,17 +324,17 @@ export const getAllEquipmentQualityStatus =
     return result;
   };
 
-export const getEquipmentByCode = async (
-  code: any
-): Promise<EquipmentModel> => {
-  const sqlQuery = 'SELECT * FROM equipment WHERE Code=? AND isActive=1';
+// export const getEquipmentByCode = async (
+//   code: any
+// ): Promise<EquipmentModel> => {
+//   const sqlQuery = 'SELECT * FROM equipment WHERE Code=? AND isActive=1';
 
-  const [result, fields] = await (
-    await connection
-  ).query<EquipmentModel & RowDataPacket[][]>(sqlQuery, code);
+//   const [result, fields] = await (
+//     await connection
+//   ).query<EquipmentModel & RowDataPacket[][]>(sqlQuery, code);
 
-  return result;
-};
+//   return result;
+// };
 
 export const registerNewEquipment = async (
   registerType: boolean,
@@ -500,7 +526,7 @@ export const putEquipmentInInventory = async (data: any) => {
 export const getAllEquipmentLoans =
   async (): Promise<displayEquipmentLoanModel> => {
     const sqlQuery =
-      'SELECT `equipmentloan`.`Id` as `IdLoan`,	`user`.`Id` as `IdUser`, `user`.`FirstName`, `user`.`FatherLastname`, `user`.`MotherLastname`, `user`.`EnrollmentDate`, `user`.`InstitutionalCode`, `equipmentloan`.`LendDateTime`, `equipmentloan`.`IsActive`FROM `equipmentloan`INNER JOIN `user` ON `equipmentloan`.`IdUser` = `User`.`Id`WHERE `equipmentloan`.`IsActive` = 1;';
+      'SELECT `equipmentloan`.`Id` as `IdLoan`,	`user`.`Id` as `IdUser`, `user`.`FirstName`, `user`.`FatherLastname`, `user`.`MotherLastname`, `user`.`InstitutionalCode`, `equipmentloan`.`LendDateTime`, `equipmentloan`.`IsActive`FROM `equipmentloan`INNER JOIN `user` ON `equipmentloan`.`IdUser` = `User`.`Id`WHERE `equipmentloan`.`IsActive` = 1;';
 
     const [result, fields] = await (
       await connection
@@ -508,3 +534,38 @@ export const getAllEquipmentLoans =
 
     return result;
   };
+
+export const newEquipmentLoan = async (
+  InstitutionalCode: string,
+  data: any
+) => {
+  const userExist = await getUserByInstitutionalCode(InstitutionalCode);
+  //@ts-ignore
+  if (userExist.length > 0) {
+    const sqlQuery = 'INSERT INTO `EquipmentLoan` (`IdUser`) VALUES (?); ';
+    const sqlQueryLoan =
+      'INSERT INTO `EquipmentLoanDetail` (`IdEquipmentLoan`, `IdEquipment`) VALUES (?, ?);';
+
+    const [row, fields] = await (
+      await connection
+    )
+      //@ts-ignore
+      .query(sqlQuery, userExist[0].Id);
+
+    //@ts-ignore
+    const insertedRow = row.insertId;
+
+    try {
+      data.forEach(async (element: any) => {
+        const [rows, fields] = await (
+          await connection
+        ).query(sqlQueryLoan, [insertedRow, element.Id]);
+      });
+      return 2;
+    } catch (error) {
+      return 0;
+    }
+  } else {
+    return 1;
+  }
+};

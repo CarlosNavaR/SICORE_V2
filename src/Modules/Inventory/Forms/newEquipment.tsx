@@ -253,8 +253,8 @@ const NewEquipmentForm = ({
                 <option value="DEFAULT" disabled>
                   Selecciona un tipo
                 </option>
-                <option value="0">Multiples productos</option>
-                <option value="1">Único equipo</option>
+                <option value="0">Suministro sin retorno</option>
+                <option value="1">Único suministro</option>
               </select>
             </div>
           </Grid>

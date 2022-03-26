@@ -119,6 +119,28 @@ export const api = {
     return EquipmentTypes;
   },
 
+  getEquipmentByCode: (Code: string) => {
+    const EquipmentTypes = ipcRenderer.invoke('Get_Equipment_By_Code', Code);
+    return EquipmentTypes;
+  },
+
+  getLoanEquipmentByCode: (Code: string) => {
+    const EquipmentTypes = ipcRenderer.invoke(
+      'Get_Loan_Equipment_By_Code',
+      Code
+    );
+    return EquipmentTypes;
+  },
+
+  newLoanEquipment: (InstitutionalCode: any, data: any) => {
+    const result = ipcRenderer.invoke(
+      'New_Equipment_Loan',
+      InstitutionalCode,
+      data
+    );
+    return result;
+  },
+
   /**
    * Provide an easier way to listen to events
    */
