@@ -600,3 +600,54 @@ export const getLoanDetails = async (
 
   return result;
 };
+
+export const deactivateEquipmentLoan = async (
+  IdEquipmentLoan: any,
+  IdEquipment: any
+) => {
+  const sqlQuery =
+    'UPDATE `sicore`.`equipmentloandetail` SET `IsActive` = 0, DateReturn = current_timestamp() WHERE IdEquipmentLoan = ? and IdEquipment = ? ;';
+
+  const [row, fields] = await (
+    await connection
+  ).query(sqlQuery, [IdEquipmentLoan, IdEquipment]);
+
+  //@ts-ignore
+  if (row.affectedRows > 0) return 1;
+  else return 0;
+};
+
+export const deactivateFullEquipmentLoan = async (
+  IdLoan: any,
+  Description: any
+) => {
+  console.log(
+    '🚀 ~ file: sqlDataService.ts ~ line 624 ~ Description',
+    Description
+  );
+  console.log('🚀 ~ file: sqlDataService.ts ~ line 624 ~ IdLoan', IdLoan);
+  const sqlQuery =
+    'UPDATE `sicore`.`equipmentloan` SET `DateReturn` = current_timestamp(), `Description` = ?, `IsActive` = 0 WHERE `Id` = ?;';
+
+  const [row, fields] = await (
+    await connection
+  ).query(sqlQuery, [Description, IdLoan]);
+
+  //@ts-ignore
+  if (row.affectedRows > 0) {
+    const sqlQueryUpdateDetails =
+      'UPDATE `sicore`.`equipmentloandetail` SET `IsActive` = 0, `DateReturn` = current_timestamp() WHERE IdEquipmentLoan = ? and IsActive = 1 ;';
+
+    const [result, fields] = await (
+      await connection
+    ).query(sqlQueryUpdateDetails, [IdLoan]);
+    //@ts-ignore
+    if (row.affectedRows > 0) {
+      return 1;
+    } else {
+      return 2;
+    }
+  } else {
+    return 0;
+  }
+};

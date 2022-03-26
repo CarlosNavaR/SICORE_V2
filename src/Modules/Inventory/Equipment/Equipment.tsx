@@ -136,6 +136,18 @@ const Equipment = () => {
     setDeleteEquipment(false);
   };
 
+  const handleQrGenerated = async (data: any) => {
+    const result = await window.Main.generateQrCode(data);
+
+    if (result === 1) {
+      toast.warning('Petición cancelada');
+    } else if (result === 2) {
+      toast.success('QR generado con éxito');
+    } else {
+      toast.error('Error al generar código qr');
+    }
+  };
+
   return (
     <div>
       <Paper
@@ -256,7 +268,7 @@ const Equipment = () => {
                         <IconButton
                           aria-label="qr"
                           onClick={() => {
-                            window.Main.generateQrCode();
+                            handleQrGenerated(row);
                           }}
                         >
                           <i

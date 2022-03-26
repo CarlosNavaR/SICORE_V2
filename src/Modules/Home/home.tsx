@@ -281,6 +281,7 @@ const Home = () => {
               <LoanDetails
                 handleClose={handleClose}
                 selectedLoan={selectedLoan}
+                getAllEquipmentLoans={getAllEquipmentLoans}
               />
             ) : (
               <NewLoanForm

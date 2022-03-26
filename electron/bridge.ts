@@ -151,8 +151,26 @@ export const api = {
     return result;
   },
 
-  generateQrCode: () => {
-    const result = ipcRenderer.invoke('generate_Code');
+  generateQrCode: (data: any) => {
+    const result = ipcRenderer.invoke('generate_Code', data);
+    return result;
+  },
+
+  deactivateEquipmentLoan: (IdEquipmentLoan: any, IdEquipment: any) => {
+    const result = ipcRenderer.invoke(
+      'deactivate_Equipment_Loan',
+      IdEquipmentLoan,
+      IdEquipment
+    );
+    return result;
+  },
+
+  deactivateFullEquipmentLoan: (IdLoan: any, Description: any) => {
+    const result = ipcRenderer.invoke(
+      'deactivate_full_equipment_loan',
+      IdLoan,
+      Description
+    );
     return result;
   },
   /**

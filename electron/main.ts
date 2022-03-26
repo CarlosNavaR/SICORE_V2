@@ -1,4 +1,6 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron';
+const path = require('path');
+const fs = require('fs');
 const nodemailer = require('nodemailer');
 const QRCode = require('qrcode');
 import {
@@ -27,10 +29,10 @@ import {
   newEquipmentLoan,
   newCategory,
   getLoanDetails,
+  deactivateEquipmentLoan,
+  deactivateFullEquipmentLoan,
 } from '../src/Services/sqlDataService';
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
-
-const path = require('path');
 
 let mainWindow: BrowserWindow | null;
 
@@ -249,29 +251,74 @@ ipcMain.handle('SendIt', (event, args) => {
   SendIt();
 });
 
-ipcMain.handle('generate_Code', async () => {
-  if (mainWindow) {
-    const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
-      properties: ['openDirectory'],
-    });
-    if (canceled) {
-      return;
-    } else {
-      QRCode.toFile(
-        filePaths[0],
-        'life of the party bros',
+ipcMain.handle('generate_Code', async (event, data) => {
+  let returnNumber = 0;
+  await dialog
+    .showSaveDialog({
+      title: 'Selecciona donde quieres guardar el archivo',
+      defaultPath: path.join(
+        __dirname,
+        '../assets/' +
+          data.EquipmentTypeName +
+          '-' +
+          data.Location +
+          '-' +
+          data.Code +
+          '.png'
+      ),
+      buttonLabel: 'Guardar',
+      // Restricting the user to only Files can accept.
+      filters: [
         {
-          color: {
-            dark: '#00F', // Blue modules
-            light: '#0000', // Transparent background
-          },
+          name: 'Image Files',
+          extensions: ['png', 'jpg'],
         },
-        function (err: any) {
-          if (err) throw err;
-          console.log('saved.');
-        }
-      );
-      return filePaths[0];
-    }
-  }
+      ],
+      properties: [],
+    })
+    .then(async (file) => {
+      if (!file.canceled) {
+        // Creating and Writing to the sample file
+        await QRCode.toFile(
+          file?.filePath?.toString(),
+          data.Code,
+          {
+            color: {
+              dark: '#00F', // Blue modules
+              light: '#0000', // Transparent background
+            },
+          },
+          function (err: any) {
+            if (err) throw err;
+            console.log('saved.');
+          }
+        );
+        returnNumber = 2;
+      } else {
+        returnNumber = 1;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return returnNumber;
 });
+
+ipcMain.handle(
+  'deactivate_Equipment_Loan',
+  async (event, IdEquipmentLoan, IdEquipment) => {
+    const result = await deactivateEquipmentLoan(IdEquipmentLoan, IdEquipment);
+
+    return result;
+  }
+);
+
+ipcMain.handle(
+  'deactivate_full_equipment_loan',
+  async (event, IdLoan, Description) => {
+    const result = await deactivateFullEquipmentLoan(IdLoan, Description);
+
+    return result;
+  }
+);
