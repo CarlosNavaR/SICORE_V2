@@ -141,6 +141,20 @@ export const api = {
     return result;
   },
 
+  newEquipmentType: (data: any) => {
+    const result = ipcRenderer.invoke('New_Equipment_Type', data);
+    return result;
+  },
+
+  getLoanDetails: (Iduser: any, IdLoan: any) => {
+    const result = ipcRenderer.invoke('Get_Loan_Details', Iduser, IdLoan);
+    return result;
+  },
+
+  generateQrCode: () => {
+    const result = ipcRenderer.invoke('generate_Code');
+    return result;
+  },
   /**
    * Provide an easier way to listen to events
    */

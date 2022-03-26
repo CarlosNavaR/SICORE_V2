@@ -256,9 +256,7 @@ const Equipment = () => {
                         <IconButton
                           aria-label="qr"
                           onClick={() => {
-                            setDeleteEquipment(true);
-                            setSelectedEquipment(row);
-                            handleOpen();
+                            window.Main.generateQrCode();
                           }}
                         >
                           <i

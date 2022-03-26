@@ -303,7 +303,7 @@ export const getAllMaintenanceEquipment =
 
 export const getAllEquipmentTypes = async (): Promise<EquipmentTypeModel> => {
   const sqlQuery =
-    'Select Id, Name, Description from EquipmentType where IsActive = 1';
+    'Select Id, Name, Description from EquipmentType where IsActive = 1 order by Name';
 
   const [result, fields] = await (
     await connection
@@ -568,4 +568,35 @@ export const newEquipmentLoan = async (
   } else {
     return 1;
   }
+};
+
+export const newCategory = async (data: any) => {
+  const sqlQueryVerify = 'select * from equipmenttype where Name =?;';
+  const sqlQuery = 'INSERT INTO `equipmenttype` (`Name`) VALUES (?);';
+
+  const [rows, fields] = await (await connection).query(sqlQueryVerify, data);
+  //@ts-ignore
+  if (rows.length > 0) {
+    return 1;
+  } else {
+    const [rows1, fields] = await (await connection).query(sqlQuery, data);
+
+    //@ts-ignore
+    if (rows1.affectedRows > 0) return 2;
+    else return 0;
+  }
+};
+
+export const getLoanDetails = async (
+  IdUser: any,
+  IdLoan: any
+): Promise<EquipmentModel> => {
+  const sqlQuery =
+    'SELECT `equipment`.`Id`, `EquipmentType`.`Name` `EquipmentTypeName`,`equipment`.`Description`, `Code`, `Location`,`EquipmentQualityStatus`.`Name` `EquipmentQualityStatusName` FROM equipment INNER JOIN `EquipmentType` ON`Equipment`.`IdEquipmentType` =`EquipmentType`.`Id` INNER JOIN `EquipmentQualityStatus` ON `Equipment`.`IdEquipmentQualityStatus` =`EquipmentQualityStatus`.`Id` INNER JOIN equipmentloandetail ON equipment.Id = equipmentloandetail.IdEquipment INNER JOIN equipmentloan ON equipmentloandetail.IdEquipmentLoan = equipmentloan.Id WHERE equipmentloandetail.IsActive =1 and equipmentloan.isActive =1 and equipmentloan.IdUser = ? and equipmentloan.Id =?;';
+
+  const [result, fields] = await (
+    await connection
+  ).query<EquipmentModel & RowDataPacket[][]>(sqlQuery, [IdUser, IdLoan]);
+
+  return result;
 };

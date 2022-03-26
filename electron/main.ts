@@ -1,4 +1,6 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog } from 'electron';
+const nodemailer = require('nodemailer');
+const QRCode = require('qrcode');
 import {
   login,
   getAllUsers,
@@ -23,6 +25,8 @@ import {
   getEquipmentByCode,
   getEquipmentByCodeForLoan,
   newEquipmentLoan,
+  newCategory,
+  getLoanDetails,
 } from '../src/Services/sqlDataService';
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
@@ -48,6 +52,7 @@ function createWindow() {
       contextIsolation: true,
       nodeIntegration: false,
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      enableRemoteModule: true,
     },
   });
   mainWindow.setMenuBarVisibility(false);
@@ -204,4 +209,69 @@ ipcMain.handle('New_Equipment_Loan', async (event, InstitutionalCode, data) => {
   const result = await newEquipmentLoan(InstitutionalCode, data);
 
   return result;
+});
+
+ipcMain.handle('New_Equipment_Type', async (event, data) => {
+  const result = await newCategory(data);
+
+  return result;
+});
+
+ipcMain.handle('Get_Loan_Details', async (event, Iduser, IdLoan) => {
+  const result = await getLoanDetails(Iduser, IdLoan);
+
+  return result;
+});
+
+function SendIt() {
+  var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'your_email@gmail.com',
+      pass: 'your_password',
+    },
+  });
+
+  const mailOptions = {
+    from: 'your_email@gmail.com',
+    to: 'recepient@gmail.com',
+    subject: 'Subject of your email',
+    html: '<p>Your html here</p>',
+  };
+
+  transporter.sendMail(mailOptions, function (err: any, info: any) {
+    if (err) console.log(err);
+    else console.log(info);
+  });
+}
+
+ipcMain.handle('SendIt', (event, args) => {
+  SendIt();
+});
+
+ipcMain.handle('generate_Code', async () => {
+  if (mainWindow) {
+    const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
+      properties: ['openDirectory'],
+    });
+    if (canceled) {
+      return;
+    } else {
+      QRCode.toFile(
+        filePaths[0],
+        'life of the party bros',
+        {
+          color: {
+            dark: '#00F', // Blue modules
+            light: '#0000', // Transparent background
+          },
+        },
+        function (err: any) {
+          if (err) throw err;
+          console.log('saved.');
+        }
+      );
+      return filePaths[0];
+    }
+  }
 });

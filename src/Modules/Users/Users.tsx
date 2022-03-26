@@ -6,7 +6,6 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Logic from './Users.logic';
 import { styled } from '@mui/system';
 import TablePaginationUnstyled from '@mui/base/TablePaginationUnstyled';
 import TextField from '@mui/material/TextField';
@@ -19,6 +18,7 @@ import Grid from '@mui/material/Grid';
 import NewUserForm from './Forms/newUserForm';
 import Styles from './user.module.css';
 import { userModel } from '../../models/userModel';
+import Logic from './Users.logic';
 
 const style = {
   position: 'absolute' as 'absolute',

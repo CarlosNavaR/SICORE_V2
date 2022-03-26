@@ -20,8 +20,9 @@ import { toast } from 'react-toastify';
 import Grid from '@mui/material/Grid';
 import Styles from './home.module.css';
 import NewLoanForm from './forms/newLoan';
-
+import LoanDetails from './Component/loanDetails';
 import Logic from './home.logic';
+import { displayEquipmentLoanModel } from '../../models/displayEquipmentLoanModel';
 dayjs.extend(relativeTime).locale('es');
 
 const style = {
@@ -114,9 +115,14 @@ const Home = () => {
   } = Logic();
 
   const [open, setOpen] = useState(false);
+  const [viewLoanDetails, setViewLoanDetails] = useState(false);
+  const [selectedLoan, setSelectedLoan] =
+    useState<displayEquipmentLoanModel | null>(null);
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
+    setSelectedLoan(null);
     setOpen(false);
+    setViewLoanDetails(false);
   };
 
   return (
@@ -204,7 +210,11 @@ const Home = () => {
                       <TableCell>
                         <Button
                           aria-label="Details"
-                          onClick={() => {}}
+                          onClick={() => {
+                            setViewLoanDetails(true);
+                            setSelectedLoan(row);
+                            handleOpen();
+                          }}
                           style={{ fontSize: 12 }}
                           startIcon={
                             <i
@@ -258,7 +268,7 @@ const Home = () => {
               }}
             >
               <p className="fs-4 fw-bold" style={{ color: 'var(--blue)' }}>
-                Registrar prestamo
+                {viewLoanDetails ? 'Detalles' : 'Registrar préstamo'}
               </p>
               <IconButton onClick={handleClose}>
                 <i
@@ -267,10 +277,17 @@ const Home = () => {
                 ></i>
               </IconButton>
             </Grid>
-            <NewLoanForm
-              handleClose={handleClose}
-              getAllEquipmentLoans={getAllEquipmentLoans}
-            />
+            {viewLoanDetails ? (
+              <LoanDetails
+                handleClose={handleClose}
+                selectedLoan={selectedLoan}
+              />
+            ) : (
+              <NewLoanForm
+                handleClose={handleClose}
+                getAllEquipmentLoans={getAllEquipmentLoans}
+              />
+            )}
           </div>
         </Box>
       </Modal>

@@ -19,7 +19,18 @@ const NewEquipmentTypeForm = ({ handleClose }: Props) => {
     formState: { errors },
   } = useForm<NewEquipmentTypeInputs>();
 
-  const onSubmit: SubmitHandler<NewEquipmentTypeInputs> = async (data) => {};
+  const onSubmit: SubmitHandler<NewEquipmentTypeInputs> = async (data) => {
+    await window.Main.newEquipmentType(data.Name).then((response) => {
+      if (response === 1) {
+        toast.warning('Categoría ya registrado');
+      } else if (response === 2) {
+        toast.success('Categoría registrado con éxito');
+        handleClose();
+      } else {
+        toast.error('Error al registrar categoria');
+      }
+    });
+  };
 
   return (
     <>
