@@ -16,6 +16,7 @@ import Layout from './Components/Layout/Layout';
 import Inventory from './Modules/Inventory/Inventory';
 import Maintenance from './Modules/Inventory/MaintenanceEquipment/MaintenanceEquipment';
 import MaintenanceDetails from './Modules/MaintenanceDetails/maintenanceDetails';
+import Report from './Modules/Reports/report';
 
 export function App() {
   return (
@@ -32,14 +33,6 @@ export function App() {
                 element={
                   <PrivateRoute>
                     <Home />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/loans/details/:id?"
-                element={
-                  <PrivateRoute>
-                    <SystemUsers />
                   </PrivateRoute>
                 }
               />
@@ -83,7 +76,14 @@ export function App() {
                   </PrivateRoute>
                 }
               />
-
+              <Route
+                path="/Reports"
+                element={
+                  <PrivateRoute>
+                    <Report />
+                  </PrivateRoute>
+                }
+              />
               <Route path="*" element={<p>There's nothing here: 404!</p>} />
             </Route>
           </Routes>

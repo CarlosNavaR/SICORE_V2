@@ -173,6 +173,11 @@ export const api = {
     );
     return result;
   },
+
+  generateStudentsReport: (data: any) => {
+    const result = ipcRenderer.invoke('generate_Report_students', data);
+    return result;
+  },
   /**
    * Provide an easier way to listen to events
    */

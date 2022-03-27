@@ -17,7 +17,7 @@ export const login = async (data: any) => {
     const { institutionalCode, password } = data;
     const result = false;
     const sqlQuery =
-      'SELECT * FROM SystemUser WHERE InstitutionalCode=? AND Password=? AND isActive=1';
+      'SELECT * FROM SystemUser WHERE InstitutionalCode=? AND Password=MD5(?) AND isActive=1';
 
     const [rows, fields] = await (
       await connection
@@ -128,7 +128,7 @@ export const registerNewSystemUser = async (data: any) => {
       return 1;
     } else {
       const sqlQuery =
-        'INSERT INTO systemuser (FirstName,FatherLastname,MotherLastname,InstitutionalCode,Password,IdSystemUserRole) VALUES(?,?,?,?,?,?)';
+        'INSERT INTO systemuser (FirstName,FatherLastname,MotherLastname,InstitutionalCode,Password,IdSystemUserRole) VALUES(?,?,?,?, MD5(?),?)';
       const [rows, fields] = await (
         await connection
       ).query(sqlQuery, [
@@ -323,18 +323,6 @@ export const getAllEquipmentQualityStatus =
 
     return result;
   };
-
-// export const getEquipmentByCode = async (
-//   code: any
-// ): Promise<EquipmentModel> => {
-//   const sqlQuery = 'SELECT * FROM equipment WHERE Code=? AND isActive=1';
-
-//   const [result, fields] = await (
-//     await connection
-//   ).query<EquipmentModel & RowDataPacket[][]>(sqlQuery, code);
-
-//   return result;
-// };
 
 export const registerNewEquipment = async (
   registerType: boolean,
@@ -650,4 +638,14 @@ export const deactivateFullEquipmentLoan = async (
   } else {
     return 0;
   }
+};
+
+export const getAllStudentsUsers = async (): Promise<userModel[]> => {
+  const sqlQuery =
+    'SELECT u.Id, u.InstitutionalCode, u.FirstName, u.FatherLastname,  u.MotherLastname,u.InstitutionalEmail, u.EnrollmentDate,  ur.Name as RoleType FROM User u INNER JOIN UserRole ur ON u.IdUserRole = ur.Id WHERE u.IsActive = 1 and u.IdUserRole = 2;';
+  const [result, fields] = await (
+    await connection
+  ).query<userModel[] & RowDataPacket[][]>(sqlQuery);
+
+  return result;
 };

@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 const path = require('path');
 const fs = require('fs');
+const Excel = require('exceljs');
 const nodemailer = require('nodemailer');
 const QRCode = require('qrcode');
 import {
@@ -31,6 +32,7 @@ import {
   getLoanDetails,
   deactivateEquipmentLoan,
   deactivateFullEquipmentLoan,
+  getAllStudentsUsers,
 } from '../src/Services/sqlDataService';
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
@@ -46,7 +48,7 @@ const assetsPath =
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    icon: '/assets/images/icons-sicore-gray.ico',
+    icon: path.join(__dirname, './assets/icons.ico'),
     height: 1000,
     width: 800,
     webPreferences: {
@@ -322,3 +324,48 @@ ipcMain.handle(
     return result;
   }
 );
+
+ipcMain.handle('generate_Report_students', async (event, data) => {
+  console.log('🚀 ~ file: main.ts ~ line 327 ~ ipcMain.handle ~ data', data);
+  const rows = await getAllStudentsUsers();
+
+  const workbook = new Excel.Workbook();
+  const worksheet = workbook.addWorksheet('Reporte de estudiantes');
+
+  worksheet.columns = [
+    { header: 'Código institucional', key: 'code', width: 30 },
+    { header: 'Nombre', key: 'name', width: 30 },
+    { header: 'Apellido paterno', key: 'FatherlastName', width: 30 },
+    { header: 'Apellido mateno', key: 'MotherLastName', width: 30 },
+    { header: 'Correo', key: 'email', width: 30 },
+    { header: 'Fecha de registro', key: 'EnrollmentDate', width: 30 },
+    { header: 'Tipo de usuario', key: 'UserType', width: 30 },
+  ];
+
+  rows.map((row: any) => {
+    worksheet.addRow({
+      code: row.InstitutionalCode,
+      name: row.FirstName,
+      FatherlastName: row.FatherLastName,
+      MotherLastName: row.MotherLastName,
+      email: row.Email,
+      EnrollmentDate: row.EnrollmentDate,
+      UserType: row.UserType,
+    });
+  });
+
+  const directory = await selectDirectory();
+  if (directory) {
+    await workbook.xlsx.writeFile(directory + '/Reporte de estudiantes.xlsx');
+  }
+});
+
+const selectDirectory = async () => {
+  if (mainWindow) {
+    const directory = await dialog.showOpenDialog(mainWindow, {
+      properties: ['openDirectory'],
+    });
+
+    return directory.filePaths[0];
+  }
+};
