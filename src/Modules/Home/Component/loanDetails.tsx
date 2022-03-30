@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -20,6 +20,7 @@ import Logic from './loanDetails.logic';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { displayEquipmentLoanModel } from '../../../models/displayEquipmentLoanModel';
 import { displayEquipmentModel } from '../../../models/displayEquipmentModel';
+import { AuthContext } from '../../../Context/authcontext';
 
 dayjs.extend(relativeTime).locale('es');
 
@@ -65,6 +66,7 @@ const LoanDetails = ({
     handleSubmit,
     formState: { errors },
   } = useForm<deactivateLoanInputs>();
+  const { auth } = useContext(AuthContext);
 
   const getDetails = () => {
     window.Main.getLoanDetails(selectedLoan?.IdUser, selectedLoan?.IdLoan).then(
@@ -77,7 +79,8 @@ const LoanDetails = ({
   const onSubmit: SubmitHandler<deactivateLoanInputs> = async (data) => {
     const result = await window.Main.deactivateFullEquipmentLoan(
       selectedLoan?.IdLoan,
-      data.Description
+      data.Description,
+      auth?.Id
     );
 
     if (result === 1) {
@@ -93,7 +96,8 @@ const LoanDetails = ({
   const handleDeactivateEquipmentLoan = async (data: any) => {
     const result = await window.Main.deactivateEquipmentLoan(
       selectedLoan?.IdLoan,
-      data.Id
+      data.Id,
+      auth?.Id
     );
     if (result === 1) {
       toast.success('Equipo regresado exitosamente');

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -19,6 +19,7 @@ import Logic from './SystemUsers.logic';
 import Styles from './systemUser.module.css';
 import NewSystemUserForm from './Forms/newSystemUserForm';
 import { SystemUserModel } from '../../models/SystemUserModel';
+import { AuthContext } from '../../Context/authcontext';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -118,9 +119,10 @@ const SystemUsers = () => {
     setSelectedUser(null);
     setDeleteUser(false);
   };
+  const { auth } = useContext(AuthContext);
 
   const handleDeleteUser = async (data: any) => {
-    const result = await window.Main.deactivateSystemUser(data);
+    const result = await window.Main.deactivateSystemUser(data, auth?.Id);
     if (result === 1) {
       toast.warning('Este usuario ya fue eliminado');
     } else if (result === 2) {

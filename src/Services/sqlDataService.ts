@@ -2,7 +2,6 @@ import { RowDataPacket } from 'mysql2';
 import { db } from './database';
 import { SystemUserModel } from '../models/SystemUserModel';
 import { userModel } from '../models/userModel';
-import { AuthModel } from '_/models/authModel';
 import { displayEquipmentModel } from '../models/displayEquipmentModel';
 import { displayMaintenanceEquipmentModel } from '../models/displayMaintenanceEquipmentModel';
 import { EquipmentTypeModel } from '../models/equipmentTypeModel';
@@ -12,19 +11,32 @@ import { displayEquipmentLoanModel } from '../models/displayEquipmentLoanModel';
 
 const connection = db.dbConnection();
 
+export const registerNewSystemActivity = async (
+  IdUser: number,
+  IdActivity: number
+) => {
+  const sqlActivityQuery =
+    'INSERT INTO `sicore`.`systemactivity` (`IdSystemUser`, `IdSystemActivityType`) VALUES (?,?);';
+
+  const [result, fields] = await (
+    await connection
+  ).query(sqlActivityQuery, [IdUser, IdActivity]);
+};
+
 export const login = async (data: any) => {
   try {
     const { institutionalCode, password } = data;
     const result = false;
     const sqlQuery =
       'SELECT * FROM SystemUser WHERE InstitutionalCode=? AND Password=MD5(?) AND isActive=1';
-
     const [rows, fields] = await (
       await connection
     ).query(sqlQuery, [institutionalCode, password]);
 
     //@ts-ignore
     if (rows.length > 0) {
+      //@ts-ignore
+      registerNewSystemActivity(rows[0].Id, 1);
       return rows;
     } else return false;
   } catch (error) {
@@ -156,7 +168,7 @@ export const updateSystemUser = async (data: any, IdUser: number) => {
     //@ts-ignore
 
     const sqlQuery =
-      'UPDATE systemuser SET FirstName=?,FatherLastname=?,MotherLastname=?,InstitutionalCode=?,Password=?,IdSystemUserRole=? WHERE Id=?';
+      'UPDATE systemuser SET FirstName=?,FatherLastname=?,MotherLastname=?,InstitutionalCode=?,Password=MD5(?),IdSystemUserRole=? WHERE Id=?';
     const [rows, fields] = await (
       await connection
     ).query(sqlQuery, [
@@ -267,8 +279,8 @@ export const getEquipmentByCode = async (
   code: any
 ): Promise<displayEquipmentModel> => {
   const sqlQuery =
-    'SELECT `Equipment`.`Id`,`Equipment`.`IdEquipmentType`,`EquipmentType`.`Name` `EquipmentTypeName`,`Equipment`.`IdEquipmentQualityStatus`,`Equipment`.`IsUnique`,`EquipmentQualityStatus`.`Name` `EquipmentQualityStatusName`,`Equipment`.`SerialNumber`,`Equipment`.`Description`,`Equipment`.`Location`,`Equipment`.`Code` FROM `Equipment` INNER JOIN `EquipmentType` ON `Equipment`.`IdEquipmentType` =`EquipmentType`.`Id` INNER JOIN `EquipmentQualityStatus` ON `Equipment`.`IdEquipmentQualityStatus` =`EquipmentQualityStatus`.`Id` WHERE `Equipment`.`IsActive`=1 and `Equipment`.`Id` NOT IN(select IdEquipment from Mantenimiento) and `Equipment`.Code=?;';
-
+    'SELECT `Equipment`.`Id`,`Equipment`.`IdEquipmentType`,`EquipmentType`.`Name` `EquipmentTypeName`,`Equipment`.`IdEquipmentQualityStatus`,`Equipment`.`IsUnique`,`EquipmentQualityStatus`.`Name` `EquipmentQualityStatusName`,`Equipment`.`SerialNumber`,`Equipment`.`Description`,`Equipment`.`Location`,`Equipment`.`Code` FROM `Equipment` INNER JOIN `EquipmentType` ON `Equipment`.`IdEquipmentType` =`EquipmentType`.`Id` INNER JOIN `EquipmentQualityStatus` ON `Equipment`.`IdEquipmentQualityStatus` =`EquipmentQualityStatus`.`Id` WHERE `Equipment`.`IsActive`=1 and `Equipment`.Code=?;';
+  //and `Equipment`.`Id` NOT IN(select IdEquipment from Mantenimiento)
   const [result, fields] = await (
     await connection
   ).query<displayEquipmentModel & RowDataPacket[][]>(sqlQuery, [code]);
@@ -415,17 +427,17 @@ export const updateEquipment = async (
       } else return 3;
     } else {
       const sqlQuery =
-        'UPDATE Equipment SET IdEquipmentType=?, IdEquipmentQualityStatus=?, SerialNumber=?, Code=?, Description=?, Location=? WHERE `Id`=?;';
+        'UPDATE `sicore`.`equipment` SET `SerialNumber` = ?, `Description` = ?, `Code` = ?, `Location` =?, `IsUnique` = ?, `IdEquipmentType` = ?, `IdEquipmentQualityStatus` = ? WHERE `Id` = ?;';
       const [rows, fields] = await (
         await connection
       ).query(sqlQuery, [
-        data.IdEquipmentType,
-        data.IdEquipmentQualityStatus,
         data.SerialNumber,
-        data.Code,
         data.Description,
+        data.Code,
         data.Location,
         data.IsUnique,
+        data.IdEquipmentType,
+        data.IdEquipmentQualityStatus,
         IdEquipment,
       ]);
 
@@ -640,12 +652,133 @@ export const deactivateFullEquipmentLoan = async (
   }
 };
 
+//* This is for reports and charts *//
 export const getAllStudentsUsers = async (): Promise<userModel[]> => {
   const sqlQuery =
     'SELECT u.Id, u.InstitutionalCode, u.FirstName, u.FatherLastname,  u.MotherLastname,u.InstitutionalEmail, u.EnrollmentDate,  ur.Name as RoleType FROM User u INNER JOIN UserRole ur ON u.IdUserRole = ur.Id WHERE u.IsActive = 1 and u.IdUserRole = 2;';
   const [result, fields] = await (
     await connection
   ).query<userModel[] & RowDataPacket[][]>(sqlQuery);
+
+  return result;
+};
+
+export const getAllTeachersUsers = async (): Promise<userModel[]> => {
+  const sqlQuery =
+    'SELECT u.Id, u.InstitutionalCode, u.FirstName, u.FatherLastname,  u.MotherLastname,u.InstitutionalEmail, u.EnrollmentDate,  ur.Name as RoleType FROM User u INNER JOIN UserRole ur ON u.IdUserRole = ur.Id WHERE u.IsActive = 1 and u.IdUserRole =1;';
+  const [result, fields] = await (
+    await connection
+  ).query<userModel[] & RowDataPacket[][]>(sqlQuery);
+
+  return result;
+};
+
+export const getQuantityOfUsers = async () => {
+  const sqlQuery =
+    'SELECT COUNT(*) totalUsers, SUM(IsActive = 0) InactiveUsers, SUM(IsActive = 1) ActiveUsers, SUM(IdUserRole = 2) StudentUsers, SUM(IdUserRole = 1) TeacherUsers FROM user;';
+  const [result, fields] = await (
+    await connection
+  ).query<userModel[] & RowDataPacket[][]>(sqlQuery);
+
+  return result;
+};
+//* start from here to export classes *//
+export const getAllGeneralEquipmentReport = async () => {
+  const sqlQuery = 'SELECT * FROM sicore.generalequipmentreport;';
+  const [result, fields] = await (await connection).query(sqlQuery);
+
+  return result;
+};
+
+export const getAllMaintenanceEquipmentReport = async () => {
+  const sqlQuery = 'SELECT * FROM sicore.maintenanceequipmentreport;';
+  const [result, fields] = await (await connection).query(sqlQuery);
+
+  return result;
+};
+
+export const getInMaintenanceEquipmentReport = async () => {
+  const sqlQuery = 'SELECT * FROM sicore.inmaintenanceequipment;';
+  const [result, fields] = await (await connection).query(sqlQuery);
+
+  return result;
+};
+
+export const getUseEquipmentLoansReport = async () => {
+  const sqlQuery = 'SELECT * FROM sicore.quantityloansequpment;';
+  const [result, fields] = await (await connection).query(sqlQuery);
+
+  return result;
+};
+
+export const getUseMaintenanceEquipmentLoansReport = async () => {
+  const sqlQuery = 'SELECT * FROM sicore.quantityloansmaintenanceequipment;';
+  const [result, fields] = await (await connection).query(sqlQuery);
+
+  return result;
+};
+
+export const getUserLog = async (
+  InstitutionalCode: number,
+  StartDate: any,
+  EndDate: any
+) => {
+  const sqlQuery = 'CALL `sicore`.`UserLogForTime`(?, ?, ?);';
+  const [result, fields] = await (await connection).query(sqlQuery);
+
+  return result;
+};
+
+export const getNextMaintenanceEquipment = async (
+  StartDate: any,
+  EndDate: any
+) => {
+  const sqlQuery = 'CALL `sicore`.`SP_NextMaintenanceEquipmentByDate`( ?, ?);';
+  const [result, fields] = await (await connection).query(sqlQuery);
+
+  return result;
+};
+
+export const getMaintenanceEquipmentLoans = async (
+  InstitutionalCode: number,
+  StartDate: any,
+  EndDate: any
+) => {
+  const sqlQuery = 'CALL `sicore`.`SP_MaintenanceEquipmentLoans`( ?, ?);';
+  const [result, fields] = await (await connection).query(sqlQuery);
+
+  return result;
+};
+
+export const getEquipmentLoans = async (StartDate: any, EndDate: any) => {
+  const sqlQuery = 'CALL `sicore`.`SP_GeneralEquipmentLoans`( ?, ?);';
+  const [result, fields] = await (await connection).query(sqlQuery);
+
+  return result;
+};
+
+//* start from here to export classes for charts *//
+
+export const getQuantityLoans = async () => {
+  const sqlQuery =
+    'SELECT COUNT(*) totalLoans, SUM(IsActive = 0) InactiveLoans, SUM(IsActive = 1) ActiveLoans FROM equipmentloan;';
+  const [result, fields] = await (await connection).query(sqlQuery);
+
+  return result;
+};
+
+export const getQuantityEquipments = async () => {
+  const sqlQuery =
+    'SELECT COUNT(*) totalEquipments, SUM(IsActive = 0) InactiveEquipments, SUM(IsActive = 1) ActiveEquipments FROM equipment WHERE EXISTS( SELECT 1 FROM `sicore`.`mantenimiento` WHERE (`equipment`.`Id` = `sicore`.`mantenimiento`.`IdEquipment`)) IS FALSE;';
+  const [result, fields] = await (await connection).query(sqlQuery);
+
+  return result;
+};
+
+export const getQuantityMaintenanceEquipments = async () => {
+  const sqlQuery =
+    'SELECT COUNT(*) totalEquipments, SUM(IsActive = 0) InactiveEquipments, SUM(IsActive = 1) ActiveEquipments, InMaintenance  FROM equipment, (SELECT COUNT(*) as InMaintenance FROM `sicore`.`mantenimiento` WHERE ( `sicore`.`mantenimiento`.`EnMantenimiento` = 1)) AS InMaintenance  WHERE EXISTS( SELECT 1 FROM `sicore`.`mantenimiento` WHERE (`equipment`.`Id` = `sicore`.`mantenimiento`.`IdEquipment`) AND `sicore`.`mantenimiento`.`EnMantenimiento` = 0) IS NOT FALSE;';
+  const [result, fields] = await (await connection).query(sqlQuery);
 
   return result;
 };

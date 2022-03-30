@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import { toast } from 'react-toastify';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { SystemUserModel } from '../../../models/SystemUserModel';
+import { AuthContext } from '../../../Context/authcontext';
 
 type NewUserInputs = {
   InstitutionalCode: string;
@@ -31,9 +32,11 @@ const NewSystemUserForm = ({
     formState: { errors },
   } = useForm<NewUserInputs>();
 
+  const { auth } = useContext(AuthContext);
+
   const onSubmit: SubmitHandler<NewUserInputs> = async (data) => {
     if (!selectedUser) {
-      await window.Main.newSystemUser(data).then((response) => {
+      await window.Main.newSystemUser(data, auth?.Id).then((response) => {
         if (response === 1) {
           toast.warning('Usuario ya registrado');
         } else if (response === 2) {
@@ -47,7 +50,7 @@ const NewSystemUserForm = ({
     } else {
       const IdSelectedUser = selectedUser?.Id;
 
-      await window.Main.updateSystemUser(data, IdSelectedUser).then(
+      await window.Main.updateSystemUser(data, IdSelectedUser, auth?.Id).then(
         (response) => {
           if (response === 2) {
             toast.success('Usuario actualizado con éxito');

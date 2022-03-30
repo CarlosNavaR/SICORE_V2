@@ -2,14 +2,14 @@ import React, { useState, useContext } from 'react';
 import prueba from '../../../assets/images/Maquinaria.jpg';
 import loginLogic from './Login.logic';
 import Home from '../Home/home';
-import { AuthContext } from '../../Context/Authcontext';
+import { AuthContext } from '../../Context/authcontext';
 
 const Login = () => {
   const { register, handleSubmit, onSubmit } = loginLogic();
   const { isLogin } = useContext(AuthContext);
 
   return (
-    <section className="vh-100">
+    <section style={{ height: '90vh' }}>
       <div className="container py-5 h-100">
         <div className="row d-flex justify-content-center align-items-center h-100">
           <div className="col col-xl-10">

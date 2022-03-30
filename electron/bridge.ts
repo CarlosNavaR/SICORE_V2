@@ -13,33 +13,67 @@ export const api = {
     return result;
   },
 
-  newUser: async (data: any) => {
-    const result = await ipcRenderer.invoke('REGISTER_USER', data);
+  handleActivitySystem: async (IdSystemUser: any) => {
+    const result = await ipcRenderer.invoke(
+      'HANDLE_ACTIVITY_SYSTEM',
+      IdSystemUser
+    );
     return result;
   },
 
-  updateUser: async (data: any, IdUser: number) => {
-    const result = await ipcRenderer.invoke('UPDATE_USER', data, IdUser);
+  newUser: async (data: any, IdSystemUser: any) => {
+    const result = await ipcRenderer.invoke(
+      'REGISTER_USER',
+      data,
+      IdSystemUser
+    );
     return result;
   },
 
-  newSystemUser: async (data: any) => {
-    const result = await ipcRenderer.invoke('REGISTER_SYSTEM_USER', data);
+  updateUser: async (data: any, IdUser: number, IdSystemUser: any) => {
+    const result = await ipcRenderer.invoke(
+      'UPDATE_USER',
+      data,
+      IdUser,
+      IdSystemUser
+    );
     return result;
   },
 
-  updateSystemUser: async (data: any, IdUser: number) => {
-    const result = await ipcRenderer.invoke('UPDATE_SYSTEM_USER', data, IdUser);
+  deactivateUser: async (data: any, IdSystemUser: any) => {
+    const result = await ipcRenderer.invoke(
+      'DEACTIVATE_USER',
+      data,
+      IdSystemUser
+    );
     return result;
   },
 
-  deactivateSystemUser: async (data: any) => {
-    const result = await ipcRenderer.invoke('DEACTIVATE_SYSTEM_USER', data);
+  newSystemUser: async (data: any, IdSystemUser: any) => {
+    const result = await ipcRenderer.invoke(
+      'REGISTER_SYSTEM_USER',
+      data,
+      IdSystemUser
+    );
     return result;
   },
 
-  deactivateUser: async (data: any) => {
-    const result = await ipcRenderer.invoke('DEACTIVATE_USER', data);
+  updateSystemUser: async (data: any, IdUser: number, IdSystemUser: any) => {
+    const result = await ipcRenderer.invoke(
+      'UPDATE_SYSTEM_USER',
+      data,
+      IdUser,
+      IdSystemUser
+    );
+    return result;
+  },
+
+  deactivateSystemUser: async (data: any, IdSystemUser: any) => {
+    const result = await ipcRenderer.invoke(
+      'DEACTIVATE_SYSTEM_USER',
+      data,
+      IdSystemUser
+    );
     return result;
   },
 
@@ -78,8 +112,17 @@ export const api = {
     return EquipmentTypes;
   },
 
-  registerNewEquipment: (registerType: boolean, data: any) => {
-    const result = ipcRenderer.invoke('Register_Equipment', registerType, data);
+  registerNewEquipment: (
+    registerType: boolean,
+    data: any,
+    IdSystemUser: any
+  ) => {
+    const result = ipcRenderer.invoke(
+      'Register_Equipment',
+      registerType,
+      data,
+      IdSystemUser
+    );
     return result;
   },
 
@@ -87,30 +130,44 @@ export const api = {
     registerType: boolean,
     data: any,
     IdEquipment: number,
-    IdMaintenance: number
+    IdMaintenance: number,
+    IdSystemUser: any
   ) => {
     const result = ipcRenderer.invoke(
       'Update_Equipment',
       registerType,
       data,
       IdEquipment,
-      IdMaintenance
+      IdMaintenance,
+      IdSystemUser
     );
     return result;
   },
 
-  deactivateEquipment: (IdEquipment: number) => {
-    const result = ipcRenderer.invoke('Deactivate_Equipment', IdEquipment);
+  deactivateEquipment: (IdEquipment: number, IdSystemUser: any) => {
+    const result = ipcRenderer.invoke(
+      'Deactivate_Equipment',
+      IdEquipment,
+      IdSystemUser
+    );
     return result;
   },
 
-  putEquipmentInInventory: (data: any) => {
-    const result = ipcRenderer.invoke('put_Equipment_In_Inventory', data);
+  putEquipmentInInventory: (data: any, IdSystemUser: any) => {
+    const result = ipcRenderer.invoke(
+      'put_Equipment_In_Inventory',
+      data,
+      IdSystemUser
+    );
     return result;
   },
 
-  putEquipmentInMaintenance: (data: any) => {
-    const result = ipcRenderer.invoke('put_Equipment_In_Maintenance', data);
+  putEquipmentInMaintenance: (data: any, IdSystemUser: any) => {
+    const result = ipcRenderer.invoke(
+      'put_Equipment_In_Maintenance',
+      data,
+      IdSystemUser
+    );
     return result;
   },
 
@@ -132,17 +189,18 @@ export const api = {
     return EquipmentTypes;
   },
 
-  newLoanEquipment: (InstitutionalCode: any, data: any) => {
+  newLoanEquipment: (InstitutionalCode: any, data: any, IdSystemUser: any) => {
     const result = ipcRenderer.invoke(
       'New_Equipment_Loan',
       InstitutionalCode,
-      data
+      data,
+      IdSystemUser
     );
     return result;
   },
 
-  newEquipmentType: (data: any) => {
-    const result = ipcRenderer.invoke('New_Equipment_Type', data);
+  newEquipmentType: (data: any, IdSystemUser: any) => {
+    const result = ipcRenderer.invoke('New_Equipment_Type', data, IdSystemUser);
     return result;
   },
 
@@ -151,33 +209,49 @@ export const api = {
     return result;
   },
 
-  generateQrCode: (data: any) => {
-    const result = ipcRenderer.invoke('generate_Code', data);
+  generateQrCode: (data: any, IdSystemUser: any) => {
+    const result = ipcRenderer.invoke('generate_Code', data, IdSystemUser);
     return result;
   },
 
-  deactivateEquipmentLoan: (IdEquipmentLoan: any, IdEquipment: any) => {
+  deactivateEquipmentLoan: (
+    IdEquipmentLoan: any,
+    IdEquipment: any,
+    IdSystemUser: any
+  ) => {
     const result = ipcRenderer.invoke(
       'deactivate_Equipment_Loan',
       IdEquipmentLoan,
-      IdEquipment
+      IdEquipment,
+      IdSystemUser
     );
     return result;
   },
 
-  deactivateFullEquipmentLoan: (IdLoan: any, Description: any) => {
+  deactivateFullEquipmentLoan: (
+    IdLoan: any,
+    Description: any,
+    IdSystemUser: any
+  ) => {
     const result = ipcRenderer.invoke(
       'deactivate_full_equipment_loan',
       IdLoan,
-      Description
+      Description,
+      IdSystemUser
     );
     return result;
   },
 
-  generateStudentsReport: (data: any) => {
-    const result = ipcRenderer.invoke('generate_Report_students', data);
+  generateStudentsReport: () => {
+    const result = ipcRenderer.invoke('generate_Report_students');
     return result;
   },
+
+  getQtyStudents: () => {
+    const result = ipcRenderer.invoke('get_Quantity_students');
+    return result;
+  },
+
   /**
    * Provide an easier way to listen to events
    */

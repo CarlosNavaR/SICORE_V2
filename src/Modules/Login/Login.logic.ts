@@ -1,7 +1,7 @@
 import { useForm, SubmitHandler } from 'react-hook-form';
 import React, { useState, useContext } from 'react';
 import { Navigate } from 'react-router-dom';
-import { AuthContext } from '../../Context/Authcontext';
+import { AuthContext } from '../../Context/authcontext';
 import { toast } from 'react-toastify';
 
 type Inputs = {

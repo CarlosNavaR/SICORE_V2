@@ -1,6 +1,6 @@
 import React, { ReactNode, useContext } from 'react';
 import { Outlet } from 'react-router-dom';
-import { AuthContext } from '../../Context/Authcontext';
+import { AuthContext } from '../../Context/authcontext';
 import styles from './layout.module.css';
 import Sidebar from '../Sidebar/Sidebar';
 type Props = {

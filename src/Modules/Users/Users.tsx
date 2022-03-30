@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -19,6 +19,7 @@ import NewUserForm from './Forms/newUserForm';
 import Styles from './user.module.css';
 import { userModel } from '../../models/userModel';
 import Logic from './Users.logic';
+import { AuthContext } from '../../Context/authcontext';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -107,6 +108,7 @@ const Users = () => {
     rows,
     searched,
   } = Logic();
+  const { auth } = useContext(AuthContext);
 
   const [selectedUser, setSelectedUser] = useState<userModel | null>(null);
   const [deleteUser, setDeleteUser] = useState(false);
@@ -119,7 +121,7 @@ const Users = () => {
   };
 
   const handleDeleteUser = async (data: any) => {
-    const result = await window.Main.deactivateUser(data);
+    const result = await window.Main.deactivateUser(data, auth?.Id);
 
     if (result === 1) {
       toast.warning('Este usuario ya fue eliminado');

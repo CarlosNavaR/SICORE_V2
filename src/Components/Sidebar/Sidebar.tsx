@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { AuthContext } from '../../Context/Authcontext';
+import { AuthContext } from '../../Context/authcontext';
 import LogoIndustrial from '../../../assets/images/Industrial.png';
 import { fontSize } from '@mui/system';
 
@@ -104,7 +104,12 @@ const Sidebar = () => {
           ''
         ) : (
           <li className="nav-item mb-1">
-            <Link to="reports" className="nav-link text-dark">
+            <Link
+              to="Reports"
+              className={`nav-link  ${
+                location.hash === '#/Reports' ? 'active' : 'text-dark'
+              }`}
+            >
               <i className="fa-solid fa-file-excel me-3"></i>
               Reportes
             </Link>

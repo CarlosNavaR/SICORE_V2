@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import { toast } from 'react-toastify';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { AuthContext } from '../../../Context/authcontext';
 
 type NewEquipmentTypeInputs = {
   Name: string;
@@ -18,9 +19,10 @@ const NewEquipmentTypeForm = ({ handleClose }: Props) => {
     handleSubmit,
     formState: { errors },
   } = useForm<NewEquipmentTypeInputs>();
+  const { auth } = useContext(AuthContext);
 
   const onSubmit: SubmitHandler<NewEquipmentTypeInputs> = async (data) => {
-    await window.Main.newEquipmentType(data.Name).then((response) => {
+    await window.Main.newEquipmentType(data.Name, auth?.Id).then((response) => {
       if (response === 1) {
         toast.warning('Categoría ya registrado');
       } else if (response === 2) {

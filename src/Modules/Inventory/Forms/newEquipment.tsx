@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import { toast } from 'react-toastify';
@@ -6,6 +6,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { EquipmentTypeModel } from '../../../models/equipmentTypeModel';
 import { EquipmentQualityStatusModel } from '../../../models/equipmentQualityStatus';
 import { displayEquipmentModel } from '../../../models/displayEquipmentModel';
+import { AuthContext } from '../../../Context/authcontext';
 
 type NewEquipmentInputs = {
   Code: string;
@@ -37,6 +38,7 @@ const NewEquipmentForm = ({
     handleSubmit,
     formState: { errors },
   } = useForm<NewEquipmentInputs>();
+  const { auth } = useContext(AuthContext);
 
   useEffect(() => {
     window.Main.getAllEquipmentTypes().then((data) => {
@@ -51,19 +53,21 @@ const NewEquipmentForm = ({
   const onSubmit: SubmitHandler<NewEquipmentInputs> = async (data) => {
     if (!selectedEquipment) {
       const saveDataForm = data;
-      await window.Main.registerNewEquipment(false, saveDataForm).then(
-        (response) => {
-          if (response === 1) {
-            toast.warning('Equipo ya registrado');
-          } else if (response === 2) {
-            toast.success('Equipo registrado con éxito');
-            handleClose();
-            getAllEquipment();
-          } else {
-            toast.error('Error al registrar Equipo');
-          }
+      await window.Main.registerNewEquipment(
+        false,
+        saveDataForm,
+        auth?.Id
+      ).then((response) => {
+        if (response === 1) {
+          toast.warning('Equipo ya registrado');
+        } else if (response === 2) {
+          toast.success('Equipo registrado con éxito');
+          handleClose();
+          getAllEquipment();
+        } else {
+          toast.error('Error al registrar Equipo');
         }
-      );
+      });
     } else {
       const IdEquipment = selectedEquipment.Id;
       const IdMaintenance = 0;
@@ -71,7 +75,8 @@ const NewEquipmentForm = ({
         false,
         data,
         IdEquipment,
-        IdMaintenance
+        IdMaintenance,
+        auth?.Id
       ).then((response) => {
         if (response === 2) {
           toast.success('Equipo actualizado con éxito');

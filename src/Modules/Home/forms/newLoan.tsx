@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -12,6 +12,7 @@ import Grid from '@mui/material/Grid';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import Logic from './newLoan.logic';
 import { displayEquipmentLoanModel } from '../../../models/displayEquipmentLoanModel';
+import { AuthContext } from '../../../Context/authcontext';
 
 type NewEquipmentLoanInputs = {
   InstitutionalCode: string;
@@ -31,22 +32,25 @@ const NewLoanForm = ({ handleClose, getAllEquipmentLoans }: Props) => {
     handleSubmit,
     formState: { errors },
   } = useForm<NewEquipmentLoanInputs>();
+  const { auth } = useContext(AuthContext);
 
   const onSubmit: SubmitHandler<NewEquipmentLoanInputs> = async (data) => {
     if (rows.length > 0) {
-      await window.Main.newLoanEquipment(data.InstitutionalCode, rows).then(
-        (response) => {
-          if (response === 1) {
-            toast.warning('Usuario no registrado');
-          } else if (response === 2) {
-            toast.success('Préstamo registrado con éxito');
-            getAllEquipmentLoans();
-            handleClose();
-          } else {
-            toast.error('Error al registrar préstamo');
-          }
+      await window.Main.newLoanEquipment(
+        data.InstitutionalCode,
+        rows,
+        auth?.Id
+      ).then((response) => {
+        if (response === 1) {
+          toast.warning('Usuario no registrado');
+        } else if (response === 2) {
+          toast.success('Préstamo registrado con éxito');
+          getAllEquipmentLoans();
+          handleClose();
+        } else {
+          toast.error('Error al registrar préstamo');
         }
-      );
+      });
     } else {
       toast.error('No se puede registrar un préstamo sin equipos');
     }

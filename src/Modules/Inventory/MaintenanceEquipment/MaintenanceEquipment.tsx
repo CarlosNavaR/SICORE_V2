@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Paper from '@mui/material/Paper';
 import { Link } from 'react-router-dom';
 import Table from '@mui/material/Table';
@@ -22,6 +22,7 @@ import Grid from '@mui/material/Grid';
 import Styles from './maintenanceEquipment.module.css';
 import Logic from './MaintenanceEquipment.logic';
 import { displayMaintenanceEquipmentModel } from '../../../models/displayMaintenanceEquipmentModel';
+import { AuthContext } from '../../../Context/authcontext';
 import NewMaintenanceForm from '../Forms/newMaintenance';
 
 dayjs.extend(relativeTime).locale('es');
@@ -114,6 +115,7 @@ const Equipment = () => {
     rows,
     searched,
   } = Logic();
+  const { auth } = useContext(AuthContext);
 
   const [selectedMaintenanceEquipment, setSelectedMaintenanceEquipment] =
     useState<displayMaintenanceEquipmentModel | null>(null);
@@ -130,7 +132,7 @@ const Equipment = () => {
   };
 
   const handleDeleteEquipment = async (data: any) => {
-    const result = await window.Main.deactivateEquipment(data.Id);
+    const result = await window.Main.deactivateEquipment(data.Id, auth?.Id);
 
     if (result === 2) {
       toast.success('Equipo eliminado con éxito');
@@ -143,7 +145,7 @@ const Equipment = () => {
   };
 
   const handlePutEquipmentInMaintenance = async (data: any) => {
-    const result = await window.Main.putEquipmentInMaintenance(data);
+    const result = await window.Main.putEquipmentInMaintenance(data, auth?.Id);
 
     if (result === 2) {
       toast.success('Equipo puesto en mantenimiento con éxito');

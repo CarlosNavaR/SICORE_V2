@@ -10,7 +10,7 @@ import Login from './Modules/Login/Login';
 import Users from './Modules/Users/Users';
 import SystemUsers from './Modules/SystemUsers/systemUsers';
 import Home from './Modules/Home/home';
-import AuthProvider from './Context/Authcontext';
+import AuthProvider from './Context/authcontext';
 import PrivateRoute from './Routes/PrivateRoute';
 import Layout from './Components/Layout/Layout';
 import Inventory from './Modules/Inventory/Inventory';

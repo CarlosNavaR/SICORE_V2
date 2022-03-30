@@ -24,11 +24,11 @@ const columns: readonly Column[] = [
     format: (value: number) => value.toFixed(0),
   },
   { id: 'Location', label: 'Ubicación', minWidth: 80 },
-  { id: 'Code', label: 'Código', minWidth: 80 },
+  { id: 'Code', label: 'Código', minWidth: 100 },
   { id: 'EquipmentTypeName', label: 'Equipo', minWidth: 100 },
   { id: 'SerialNumber', label: 'Numero de serie', minWidth: 100 },
   { id: 'Description', label: 'Descripción', minWidth: 120 },
-  { id: 'EquipmentQualityStatusName', label: 'Estado', minWidth: 100 },
+  { id: 'EquipmentQualityStatusName', label: 'Estado', minWidth: 80 },
 ];
 
 const Equipment = () => {

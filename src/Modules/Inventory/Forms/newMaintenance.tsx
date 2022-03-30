@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import { toast } from 'react-toastify';
@@ -9,6 +9,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { EquipmentTypeModel } from '../../../models/equipmentTypeModel';
 import { EquipmentQualityStatusModel } from '../../../models/equipmentQualityStatus';
 import { displayMaintenanceEquipmentModel } from '../../../models/displayMaintenanceEquipmentModel';
+import { AuthContext } from '../../../Context/authcontext';
 
 dayjs.extend(relativeTime).locale('es');
 
@@ -39,6 +40,7 @@ const NewSystemUserForm = ({
   const [equipmentQualityStatus, setEquipmentQualityStatus] = useState<
     EquipmentQualityStatusModel[]
   >([]);
+  const { auth } = useContext(AuthContext);
 
   const {
     register,
@@ -62,7 +64,7 @@ const NewSystemUserForm = ({
     if (!selectedMaintenanceEquipment) {
       const saveDataForm = data;
 
-      await window.Main.registerNewEquipment(true, saveDataForm).then(
+      await window.Main.registerNewEquipment(true, saveDataForm, auth?.Id).then(
         (response) => {
           if (response === 1) {
             toast.warning('Equipo ya registrado');
@@ -82,7 +84,8 @@ const NewSystemUserForm = ({
         true,
         data,
         IdEquipment,
-        IdMaintenance
+        IdMaintenance,
+        auth?.Id
       ).then((response) => {
         if (response === 2) {
           toast.success('Equipo actualizado con éxito');

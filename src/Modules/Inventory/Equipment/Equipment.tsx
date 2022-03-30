@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -20,6 +20,7 @@ import Logic from './Equipment.logic';
 import { displayEquipmentModel } from '../../../models/displayEquipmentModel';
 import NewEquipmentForm from '../Forms/newEquipment';
 import NewEquipmentTypeForm from '../Forms/newCategory';
+import { AuthContext } from '../../../Context/authcontext';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -109,6 +110,7 @@ const Equipment = () => {
     rows,
     searched,
   } = Logic();
+  const { auth } = useContext(AuthContext);
 
   const [selectedEquipment, setSelectedEquipment] =
     useState<displayEquipmentModel | null>(null);
@@ -124,7 +126,7 @@ const Equipment = () => {
   };
 
   const handleDeleteEquipment = async (data: any) => {
-    const result = await window.Main.deactivateEquipment(data.Id);
+    const result = await window.Main.deactivateEquipment(data.Id, auth?.Id);
 
     if (result === 2) {
       toast.success('Equipo eliminado con éxito');
@@ -137,7 +139,7 @@ const Equipment = () => {
   };
 
   const handleQrGenerated = async (data: any) => {
-    const result = await window.Main.generateQrCode(data);
+    const result = await window.Main.generateQrCode(data, auth?.Id);
 
     if (result === 1) {
       toast.warning('Petición cancelada');

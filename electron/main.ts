@@ -4,6 +4,7 @@ const fs = require('fs');
 const Excel = require('exceljs');
 const nodemailer = require('nodemailer');
 const QRCode = require('qrcode');
+const dotenv = require('dotenv').config();
 import {
   login,
   getAllUsers,
@@ -33,7 +34,12 @@ import {
   deactivateEquipmentLoan,
   deactivateFullEquipmentLoan,
   getAllStudentsUsers,
+  getQuantityOfUsers,
+  registerNewSystemActivity,
 } from '../src/Services/sqlDataService';
+import dayjs from 'dayjs';
+import 'dayjs/locale/es';
+import relativeTime from 'dayjs/plugin/relativeTime';
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
 let mainWindow: BrowserWindow | null;
@@ -57,6 +63,7 @@ function createWindow() {
       nodeIntegration: false,
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       enableRemoteModule: true,
+      devTools: !app.isPackaged,
     },
   });
   mainWindow.setMenuBarVisibility(false);
@@ -88,6 +95,11 @@ ipcMain.handle('VALIDATE_LOGIN', async (event, data) => {
   return result;
 });
 
+ipcMain.handle('HANDLE_ACTIVITY_SYSTEM', async (event, IdSystemUser) => {
+  const result = await registerNewSystemActivity(IdSystemUser, 2);
+  return result;
+});
+
 ipcMain.handle('Get_all_users', async () => {
   const result = await getAllUsers();
   return result;
@@ -98,38 +110,46 @@ ipcMain.handle('Get_all_system_users', async () => {
   return result;
 });
 
-ipcMain.handle('REGISTER_USER', async (event, data) => {
+ipcMain.handle('REGISTER_USER', async (event, data, IdSystemUser) => {
   const result = await registerNewUser(data);
-
+  await registerNewSystemActivity(IdSystemUser, 11);
   return result;
 });
 
-ipcMain.handle('UPDATE_USER', async (event, data, IdUser) => {
+ipcMain.handle('UPDATE_USER', async (event, data, IdUser, IdSystemUser) => {
   const result = await updateUser(data, IdUser);
+  await registerNewSystemActivity(IdSystemUser, 12);
 
   return result;
 });
 
-ipcMain.handle('DEACTIVATE_USER', async (event, data) => {
+ipcMain.handle('DEACTIVATE_USER', async (event, data, IdSystemUser) => {
   const result = await deactivateUser(data);
+  await registerNewSystemActivity(IdSystemUser, 13);
 
   return result;
 });
 
-ipcMain.handle('REGISTER_SYSTEM_USER', async (event, data) => {
+ipcMain.handle('REGISTER_SYSTEM_USER', async (event, data, IdSystemUser) => {
   const result = await registerNewSystemUser(data);
+  await registerNewSystemActivity(IdSystemUser, 8);
 
   return result;
 });
 
-ipcMain.handle('UPDATE_SYSTEM_USER', async (event, data, IdUser) => {
-  const result = await updateSystemUser(data, IdUser);
+ipcMain.handle(
+  'UPDATE_SYSTEM_USER',
+  async (event, data, IdUser, IdSystemUser) => {
+    const result = await updateSystemUser(data, IdUser);
+    await registerNewSystemActivity(IdSystemUser, 9);
 
-  return result;
-});
+    return result;
+  }
+);
 
-ipcMain.handle('DEACTIVATE_SYSTEM_USER', async (event, data) => {
+ipcMain.handle('DEACTIVATE_SYSTEM_USER', async (event, data, IdSystemUser) => {
   const result = await deactivateSystemUser(data);
+  await registerNewSystemActivity(IdSystemUser, 10);
 
   return result;
 });
@@ -159,38 +179,68 @@ ipcMain.handle('Get_All_EquipmentQualityStatus', async () => {
   return result;
 });
 
-ipcMain.handle('Register_Equipment', async (event, registerType, data) => {
-  const result = await registerNewEquipment(registerType, data);
-  return result;
-});
+ipcMain.handle(
+  'Register_Equipment',
+  async (event, registerType, data, IdSystemUser) => {
+    const result = await registerNewEquipment(registerType, data);
+
+    await registerNewSystemActivity(IdSystemUser, 5);
+
+    return result;
+  }
+);
 
 ipcMain.handle(
   'Update_Equipment',
-  async (event, registerType, data, IdEquipment, IdMaintenance) => {
+  async (
+    event,
+    registerType,
+    data,
+    IdEquipment,
+    IdMaintenance,
+    IdSystemUser
+  ) => {
     const result = await updateEquipment(
       registerType,
       data,
       IdEquipment,
       IdMaintenance
     );
+    await registerNewSystemActivity(IdSystemUser, 6);
+
     return result;
   }
 );
 
-ipcMain.handle('Deactivate_Equipment', async (event, IdEquipment) => {
-  const result = await deactivateEquipment(IdEquipment);
-  return result;
-});
+ipcMain.handle(
+  'Deactivate_Equipment',
+  async (event, IdEquipment, IdSystemUser) => {
+    const result = await deactivateEquipment(IdEquipment);
+    await registerNewSystemActivity(IdSystemUser, 7);
 
-ipcMain.handle('put_Equipment_In_Inventory', async (event, data) => {
-  const result = await putEquipmentInInventory(data);
-  return result;
-});
+    return result;
+  }
+);
 
-ipcMain.handle('put_Equipment_In_Maintenance', async (event, data) => {
-  const result = await putEquipmentInMaintenance(data);
-  return result;
-});
+ipcMain.handle(
+  'put_Equipment_In_Inventory',
+  async (event, data, IdSystemUser) => {
+    const result = await putEquipmentInInventory(data);
+    await registerNewSystemActivity(IdSystemUser, 15);
+
+    return result;
+  }
+);
+
+ipcMain.handle(
+  'put_Equipment_In_Maintenance',
+  async (event, data, IdSystemUser) => {
+    const result = await putEquipmentInMaintenance(data);
+    await registerNewSystemActivity(IdSystemUser, 14);
+
+    return result;
+  }
+);
 
 ipcMain.handle('Get_All_EquipmentLoans', async () => {
   const result = await getAllEquipmentLoans();
@@ -209,14 +259,19 @@ ipcMain.handle('Get_Equipment_By_Code', async (event, Code) => {
   return result;
 });
 
-ipcMain.handle('New_Equipment_Loan', async (event, InstitutionalCode, data) => {
-  const result = await newEquipmentLoan(InstitutionalCode, data);
+ipcMain.handle(
+  'New_Equipment_Loan',
+  async (event, InstitutionalCode, data, IdSystemUser) => {
+    const result = await newEquipmentLoan(InstitutionalCode, data);
+    await registerNewSystemActivity(IdSystemUser, 3);
 
-  return result;
-});
+    return result;
+  }
+);
 
-ipcMain.handle('New_Equipment_Type', async (event, data) => {
+ipcMain.handle('New_Equipment_Type', async (event, data, IdSystemUser) => {
   const result = await newCategory(data);
+  await registerNewSystemActivity(IdSystemUser, 16);
 
   return result;
 });
@@ -231,14 +286,14 @@ function SendIt() {
   var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'your_email@gmail.com',
-      pass: 'your_password',
+      user: process.env.EMAIL_KEY,
+      pass: process.env.EMAIL_PASS_KEY,
     },
   });
 
   const mailOptions = {
-    from: 'your_email@gmail.com',
-    to: 'recepient@gmail.com',
+    from: process.env.EMAIL_KEY,
+    to: 'carlos.nava17@tectijuana.edu.mx',
     subject: 'Subject of your email',
     html: '<p>Your html here</p>',
   };
@@ -249,11 +304,7 @@ function SendIt() {
   });
 }
 
-ipcMain.handle('SendIt', (event, args) => {
-  SendIt();
-});
-
-ipcMain.handle('generate_Code', async (event, data) => {
+ipcMain.handle('generate_Code', async (event, data, IdSystemUser) => {
   let returnNumber = 0;
   await dialog
     .showSaveDialog({
@@ -295,6 +346,7 @@ ipcMain.handle('generate_Code', async (event, data) => {
             console.log('saved.');
           }
         );
+        await registerNewSystemActivity(IdSystemUser, 17);
         returnNumber = 2;
       } else {
         returnNumber = 1;
@@ -309,8 +361,9 @@ ipcMain.handle('generate_Code', async (event, data) => {
 
 ipcMain.handle(
   'deactivate_Equipment_Loan',
-  async (event, IdEquipmentLoan, IdEquipment) => {
+  async (event, IdEquipmentLoan, IdEquipment, IdSystemUser) => {
     const result = await deactivateEquipmentLoan(IdEquipmentLoan, IdEquipment);
+    await registerNewSystemActivity(IdSystemUser, 18);
 
     return result;
   }
@@ -318,15 +371,15 @@ ipcMain.handle(
 
 ipcMain.handle(
   'deactivate_full_equipment_loan',
-  async (event, IdLoan, Description) => {
+  async (event, IdLoan, Description, IdSystemUser) => {
     const result = await deactivateFullEquipmentLoan(IdLoan, Description);
-
+    SendIt();
+    await registerNewSystemActivity(IdSystemUser, 4);
     return result;
   }
 );
 
-ipcMain.handle('generate_Report_students', async (event, data) => {
-  console.log('🚀 ~ file: main.ts ~ line 327 ~ ipcMain.handle ~ data', data);
+ipcMain.handle('generate_Report_students', async () => {
   const rows = await getAllStudentsUsers();
 
   const workbook = new Excel.Workbook();
@@ -335,8 +388,8 @@ ipcMain.handle('generate_Report_students', async (event, data) => {
   worksheet.columns = [
     { header: 'Código institucional', key: 'code', width: 30 },
     { header: 'Nombre', key: 'name', width: 30 },
-    { header: 'Apellido paterno', key: 'FatherlastName', width: 30 },
-    { header: 'Apellido mateno', key: 'MotherLastName', width: 30 },
+    { header: 'Apellido paterno', key: 'FatherL', width: 30 },
+    { header: 'Apellido mateno', key: 'MotherL', width: 30 },
     { header: 'Correo', key: 'email', width: 30 },
     { header: 'Fecha de registro', key: 'EnrollmentDate', width: 30 },
     { header: 'Tipo de usuario', key: 'UserType', width: 30 },
@@ -346,17 +399,22 @@ ipcMain.handle('generate_Report_students', async (event, data) => {
     worksheet.addRow({
       code: row.InstitutionalCode,
       name: row.FirstName,
-      FatherlastName: row.FatherLastName,
-      MotherLastName: row.MotherLastName,
-      email: row.Email,
+      FatherL: row.FatherLastname,
+      MotherL: row.MotherLastname,
+      email: row.InstitutionalEmail,
       EnrollmentDate: row.EnrollmentDate,
-      UserType: row.UserType,
+      UserType: row.RoleType,
     });
   });
 
   const directory = await selectDirectory();
   if (directory) {
-    await workbook.xlsx.writeFile(directory + '/Reporte de estudiantes.xlsx');
+    await workbook.xlsx.writeFile(
+      directory +
+        '/Reporte de estudiantes-' +
+        dayjs(new Date()).format('DD MMM, YYYY').toString() +
+        '.xlsx'
+    );
   }
 });
 
@@ -369,3 +427,8 @@ const selectDirectory = async () => {
     return directory.filePaths[0];
   }
 };
+
+ipcMain.handle('get_Quantity_students', async () => {
+  const result = await getQuantityOfUsers();
+  return result;
+});

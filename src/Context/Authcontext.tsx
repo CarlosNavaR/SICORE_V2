@@ -57,6 +57,7 @@ const AuthProvider = ({ children }: Props) => {
   };
 
   const logout = async () => {
+    await window.Main.handleActivitySystem(auth?.Id);
     setIsLogin(false);
     setAuth(null);
     await localStorage.removeItem('auth');

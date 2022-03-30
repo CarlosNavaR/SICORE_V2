@@ -29,10 +29,10 @@ const columns: readonly Column[] = [
     format: (value: number) => value.toFixed(0),
   },
   { id: 'Location', label: 'Ubicación', minWidth: 80 },
-  { id: 'Code', label: 'Código', minWidth: 80 },
-  { id: 'EquipmentTypeName', label: 'Equipo', minWidth: 100 },
+  { id: 'Code', label: 'Código', minWidth: 100 },
+  { id: 'EquipmentTypeName', label: 'Equipo', minWidth: 80 },
   { id: 'SerialNumber', label: 'Numero de serie', minWidth: 80 },
-  { id: 'Description', label: 'Descripción', minWidth: 120 },
+  { id: 'Description', label: 'Descripción', minWidth: 110 },
   {
     id: 'Frecuencia',
     label: 'Frecuencia',
