@@ -242,16 +242,109 @@ export const api = {
     return result;
   },
 
-  generateStudentsReport: () => {
-    const result = ipcRenderer.invoke('generate_Report_students');
-    return result;
-  },
-
+  //* Stats from charts *//
   getQtyStudents: () => {
     const result = ipcRenderer.invoke('get_Quantity_students');
     return result;
   },
 
+  getQtyLoans: () => {
+    const result = ipcRenderer.invoke('get_Quantity_Loan');
+    return result;
+  },
+
+  getQtyEquipments: () => {
+    const result = ipcRenderer.invoke('get_Quantity_Equipments');
+    return result;
+  },
+
+  getQtyMaintenanceEquipment: () => {
+    const result = ipcRenderer.invoke('get_Quantity_Maintenance_Equipments');
+    return result;
+  },
+
+  //* this is for generate reports *//
+
+  generateStudentsReport: () => {
+    const result = ipcRenderer.invoke('generate_Report_students');
+    return result;
+  },
+
+  generateTeachersReport: () => {
+    const result = ipcRenderer.invoke('generate_Report_Teachers');
+    return result;
+  },
+
+  generateLogUser: (InstitutionalCode: any, StartDate: any, EndDate: any) => {
+    const result = ipcRenderer.invoke(
+      'generate_Report_Log_User',
+      InstitutionalCode,
+      StartDate,
+      EndDate
+    );
+    return result;
+  },
+
+  generateLoanMaintenanceEquipment: (StartDate: any, EndDate: any) => {
+    const result = ipcRenderer.invoke(
+      'generate_Maintenance_Equipment_Loans_Report',
+      StartDate,
+      EndDate
+    );
+
+    return result;
+  },
+
+  generateLoanEquipment: (StartDate: any, EndDate: any) => {
+    const result = ipcRenderer.invoke(
+      'generate_Equipment_Loans_Report',
+      StartDate,
+      EndDate
+    );
+
+    return result;
+  },
+
+  generateInventoryEquipment: () => {
+    const result = ipcRenderer.invoke('generate_inventory_equipment_report');
+    return result;
+  },
+
+  generateUseEquipment: () => {
+    const result = ipcRenderer.invoke('generate_use_equipment_report');
+    return result;
+  },
+
+  generateInventoryMaintenanceEquipment: () => {
+    const result = ipcRenderer.invoke(
+      'generate_inventory_maintenance_equipment_report'
+    );
+    return result;
+  },
+
+  generateInventoryInMaintenanceEquipment: () => {
+    const result = ipcRenderer.invoke(
+      'generate_in_maintenance_equipment_report'
+    );
+    return result;
+  },
+
+  generateUseMaintenanceEquipment: () => {
+    const result = ipcRenderer.invoke(
+      'generate_use_maintenance_equipment_report'
+    );
+    return result;
+  },
+
+  generateNexMaintenanceEquipment: (StartDate: any, EndDate: any) => {
+    const result = ipcRenderer.invoke(
+      'generate_Next_maintenance_equipment_report',
+      StartDate,
+      EndDate
+    );
+
+    return result;
+  },
   /**
    * Provide an easier way to listen to events
    */

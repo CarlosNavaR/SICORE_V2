@@ -7,12 +7,13 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 import { toast } from 'react-toastify';
 import { styled } from '@mui/system';
 import IconButton from '@mui/material/IconButton';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
-import LogUser from './Forms/logUser';
+import LoanReport from './Forms/loansReport';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -28,64 +29,43 @@ const style = {
 
 function createData(
   Id: number,
-  totalUsers: number,
-  InactiveUsers: number,
-  ActiveUsers: number,
-  StudentUsers: number,
-  TeacherUsers: number
+  totalLoans: number,
+  InactiveLoan: number,
+  ActiveLoan: number
 ) {
   return {
     Id,
-    totalUsers,
-    ActiveUsers,
-    InactiveUsers,
-    StudentUsers,
-    TeacherUsers,
+    totalLoans,
+    InactiveLoan,
+    ActiveLoan,
   };
 }
 
-const ChartUser = () => {
+const ChartLoans = () => {
   const [data, setData] = useState([] as any);
   const [rows, setRows] = useState([] as any);
+  const [reportType, setReportType] = useState(0);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
+    setReportType(0);
     setOpen(false);
   };
 
   const handleData = async () => {
-    const result = await window.Main.getQtyStudents();
+    const result = await window.Main.getQtyLoans();
 
-    const chartRow = [result[0].StudentUsers, result[0].TeacherUsers];
+    const chartRow = [result[0].InactiveLoans, result[0].ActiveLoans];
     setRows([
       createData(
         1,
-        result[0].totalUsers,
-        result[0].InactiveUsers,
-        result[0].ActiveUsers,
-        result[0].StudentUsers,
-        result[0].TeacherUsers
+        result[0].totalLoans,
+        result[0].ActiveLoans,
+        result[0].InactiveLoans
       ),
     ]);
 
     setData(chartRow);
-  };
-
-  const handleTeachersReport = async () => {
-    const result = await window.Main.generateTeachersReport();
-    if (result === 1) {
-      toast.success('Reporte generado con éxito');
-    } else {
-      toast.error('Ocurrió un error al generar el reporte');
-    }
-  };
-  const handleStudentReport = async () => {
-    const result = await window.Main.generateStudentsReport();
-    if (result === 1) {
-      toast.success('Reporte generado con éxito');
-    } else {
-      toast.error('Ocurrió un error al generar el reporte');
-    }
   };
 
   useEffect(() => {
@@ -96,10 +76,13 @@ const ChartUser = () => {
     <Grid container justifyContent="center">
       <Grid item xs={5} style={{ textAlign: 'center' }}>
         <p className="text-muted h5">
-          Gráfica de estudiantes y docentes activos
+          Gráfica de prestamos activos e inactivos
         </p>
         <div>
-          <Chart data={data} labels={['Estudiantes', 'Docentes']} />
+          <Chart
+            data={data}
+            labels={['Prestamos activos', 'Prestamos liberados']}
+          />
         </div>
       </Grid>
       <Grid item xs={7} className="p-3">
@@ -107,55 +90,45 @@ const ChartUser = () => {
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead style={{ backgroundColor: '#f3f6f9' }}>
               <TableRow>
-                <TableCell>Total de usuarios</TableCell>
-                <TableCell>Usuarios eliminados</TableCell>
-                <TableCell>Usuarios activos</TableCell>
-                <TableCell>Estudiantes</TableCell>
-                <TableCell>Docentes</TableCell>
+                <TableCell>Total de prestamos</TableCell>
+                <TableCell>Prestamos activos</TableCell>
+                <TableCell>Prestamos regresados</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {rows.map((row: any) => (
                 <TableRow key={row.Id}>
                   <TableCell component="th" scope="row">
-                    {row.totalUsers}
+                    {row.totalLoans}
                   </TableCell>
-                  <TableCell>{row.InactiveUsers}</TableCell>
-                  <TableCell>{row.ActiveUsers}</TableCell>
-                  <TableCell>{row.StudentUsers}</TableCell>
-                  <TableCell>{row.TeacherUsers}</TableCell>
+                  <TableCell>{row.InactiveLoan}</TableCell>
+                  <TableCell>{row.ActiveLoan}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
 
-        <button
-          className="btn btn-outline-dark mt-3 me-3"
-          onClick={() => {
-            handleStudentReport();
-          }}
-        >
-          Reporte de estudiantes
-        </button>
-
-        <button
-          className="btn btn-outline-dark mt-3 me-3"
-          onClick={() => {
-            handleTeachersReport();
-          }}
-        >
-          Reporte de docentes
-        </button>
-
-        <button
-          className="btn btn-outline-dark mt-3 "
-          onClick={() => {
-            handleOpen();
-          }}
-        >
-          Historial de usuario
-        </button>
+        <div>
+          <button
+            className="btn btn-outline-dark mt-3 me-3"
+            onClick={() => {
+              setReportType(1);
+              handleOpen();
+            }}
+          >
+            Reporte de suministros prestados
+          </button>
+          <button
+            className="btn btn-outline-dark mt-3 me-3"
+            onClick={() => {
+              setReportType(2);
+              handleOpen();
+            }}
+          >
+            Reporte de equipos prestados
+          </button>
+        </div>
       </Grid>
 
       <Modal
@@ -181,11 +154,11 @@ const ChartUser = () => {
               ></i>
             </IconButton>
           </Grid>
-          <LogUser handleClose={handleClose} />
+          <LoanReport handleClose={handleClose} reportType={reportType} />
         </Box>
       </Modal>
     </Grid>
   );
 };
 
-export default ChartUser;
+export default ChartLoans;

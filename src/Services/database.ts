@@ -1,9 +1,9 @@
-import mySql, { Connection } from 'mysql2/promise';
+import mySql, { Connection, Pool } from 'mysql2/promise';
 
 export class db {
-  public static connection: Connection;
+  public static connection: Connection | Pool;
 
-  public static async dbConnection(): Promise<Connection> {
+  public static async dbConnection(): Promise<Connection | Pool> {
     if (this.connection) {
       return this.connection;
     }
@@ -11,8 +11,8 @@ export class db {
     return this.connection;
   }
   private static async createConnection() {
-    this.connection = await mySql.createConnection({
-      host: '192.168.3.9',
+    this.connection = await mySql.createPool({
+      host: 'localhost',
       port: 3306,
       user: 'sicore_app',
       password: 'sicore_app',

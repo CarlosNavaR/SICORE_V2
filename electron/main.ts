@@ -36,6 +36,19 @@ import {
   getAllStudentsUsers,
   getQuantityOfUsers,
   registerNewSystemActivity,
+  getAllGeneralEquipmentReport,
+  getAllMaintenanceEquipmentReport,
+  getInMaintenanceEquipmentReport,
+  getUseEquipmentLoansReport,
+  getUseMaintenanceEquipmentLoansReport,
+  getUserLog,
+  getNextMaintenanceEquipment,
+  getMaintenanceEquipmentLoans,
+  getEquipmentLoans,
+  getQuantityLoans,
+  getQuantityEquipments,
+  getQuantityMaintenanceEquipments,
+  getAllTeachersUsers,
 } from '../src/Services/sqlDataService';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
@@ -373,11 +386,31 @@ ipcMain.handle(
   'deactivate_full_equipment_loan',
   async (event, IdLoan, Description, IdSystemUser) => {
     const result = await deactivateFullEquipmentLoan(IdLoan, Description);
-    SendIt();
+    //SendIt();
     await registerNewSystemActivity(IdSystemUser, 4);
     return result;
   }
 );
+
+ipcMain.handle('get_Quantity_students', async () => {
+  const result = await getQuantityOfUsers();
+  return result;
+});
+
+ipcMain.handle('get_Quantity_Loan', async () => {
+  const result = await getQuantityLoans();
+  return result;
+});
+
+ipcMain.handle('get_Quantity_Equipments', async () => {
+  const result = await getQuantityEquipments();
+  return result;
+});
+
+ipcMain.handle('get_Quantity_Maintenance_Equipments', async () => {
+  const result = await getQuantityMaintenanceEquipments();
+  return result;
+});
 
 ipcMain.handle('generate_Report_students', async () => {
   const rows = await getAllStudentsUsers();
@@ -389,7 +422,7 @@ ipcMain.handle('generate_Report_students', async () => {
     { header: 'Código institucional', key: 'code', width: 30 },
     { header: 'Nombre', key: 'name', width: 30 },
     { header: 'Apellido paterno', key: 'FatherL', width: 30 },
-    { header: 'Apellido mateno', key: 'MotherL', width: 30 },
+    { header: 'Apellido materno', key: 'MotherL', width: 30 },
     { header: 'Correo', key: 'email', width: 30 },
     { header: 'Fecha de registro', key: 'EnrollmentDate', width: 30 },
     { header: 'Tipo de usuario', key: 'UserType', width: 30 },
@@ -415,8 +448,508 @@ ipcMain.handle('generate_Report_students', async () => {
         dayjs(new Date()).format('DD MMM, YYYY').toString() +
         '.xlsx'
     );
+    return 1;
+  } else {
+    return 0;
   }
 });
+
+ipcMain.handle('generate_Report_Teachers', async () => {
+  const rows = await getAllTeachersUsers();
+
+  const workbook = new Excel.Workbook();
+  const worksheet = workbook.addWorksheet('Reporte de docentes');
+
+  worksheet.columns = [
+    { header: 'Código institucional', key: 'code', width: 30 },
+    { header: 'Nombre', key: 'name', width: 30 },
+    { header: 'Apellido paterno', key: 'FatherL', width: 30 },
+    { header: 'Apellido materno', key: 'MotherL', width: 30 },
+    { header: 'Correo', key: 'email', width: 30 },
+    { header: 'Fecha de registro', key: 'EnrollmentDate', width: 30 },
+    { header: 'Tipo de usuario', key: 'UserType', width: 30 },
+  ];
+
+  rows.map((row: any) => {
+    worksheet.addRow({
+      code: row.InstitutionalCode,
+      name: row.FirstName,
+      FatherL: row.FatherLastname,
+      MotherL: row.MotherLastname,
+      email: row.InstitutionalEmail,
+      EnrollmentDate: row.EnrollmentDate,
+      UserType: row.RoleType,
+    });
+  });
+
+  const directory = await selectDirectory();
+  if (directory) {
+    await workbook.xlsx.writeFile(
+      directory +
+        '/Reporte de docentes-' +
+        dayjs(new Date()).format('DD MMM, YYYY').toString() +
+        '.xlsx'
+    );
+    return 1;
+  } else {
+    return 0;
+  }
+});
+
+ipcMain.handle(
+  'generate_Report_Log_User',
+  async (event, InstitutionalCode, StartDate, EndDate) => {
+    const rows = await getUserLog(InstitutionalCode, StartDate, EndDate);
+
+    const workbook = new Excel.Workbook();
+    const worksheet = workbook.addWorksheet(
+      'Historial de usuario ' + InstitutionalCode
+    );
+
+    worksheet.columns = [
+      { header: 'Código institucional', key: 'code', width: 30 },
+      { header: 'Nombre', key: 'name', width: 30 },
+      { header: 'Apellido paterno', key: 'FatherL', width: 30 },
+      { header: 'Apellido materno', key: 'MotherL', width: 30 },
+      { header: 'Código de equipo', key: 'equipmentCode', width: 30 },
+      { header: 'Equipo', key: 'equipment', width: 30 },
+      { header: 'Fecha de préstamo', key: 'EquipmentLoan', width: 30 },
+      { header: 'Comentarios de préstamo', key: 'loanDescrip', width: 30 },
+    ];
+
+    //@ts-ignore
+    rows[0].map((row: any) => {
+      worksheet.addRow({
+        code: row.UserInstitutionalCode,
+        name: row.UserFirstName,
+        FatherL: row.UserFatherLastname,
+        MotherL: row.UserMotherLastname,
+        equipmentCode: row.EquipmentCode,
+        equipment: row.EquipmentTypeName,
+        EquipmentLoan: row.EquipmentLoanDateBorrow,
+        loanDescrip: row.LoanDescription,
+      });
+    });
+
+    const directory = await selectDirectory();
+    if (directory) {
+      await workbook.xlsx.writeFile(
+        directory +
+          '/Historial de usuario-' +
+          InstitutionalCode +
+          '-' +
+          dayjs(new Date()).format('DD MMM, YYYY').toString() +
+          '.xlsx'
+      );
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+);
+
+ipcMain.handle(
+  'generate_Maintenance_Equipment_Loans_Report',
+  async (event, StartDate, EndDate) => {
+    const rows = await getMaintenanceEquipmentLoans(StartDate, EndDate);
+
+    const workbook = new Excel.Workbook();
+    const worksheet = workbook.addWorksheet('Reporte de equipos prestados');
+
+    worksheet.columns = [
+      { header: 'Equipo', key: 'EquipmentTypeName', width: 30 },
+      { header: 'Numero de serie', key: 'EquipmentSerialNumber', width: 30 },
+      { header: 'Descripción', key: 'EquipmentDescription', width: 30 },
+      { header: 'Código de equipo', key: 'EquipmentCode', width: 30 },
+      {
+        header: 'Fecha de préstamo',
+        key: 'EquipmentLoanLendDateTime',
+        width: 30,
+      },
+      { header: 'Fecha de retorno', key: 'EquipmentDateReturn', width: 30 },
+      { header: 'Solicitante', key: 'UserFirstName', width: 30 },
+      { header: 'Apellido paterno', key: 'UserFatherLastName', width: 30 },
+      { header: 'Apellido materno', key: 'UserMotherLastName', width: 30 },
+      {
+        header: 'Código institucional',
+        key: 'UserInstitutionalCode',
+        width: 30,
+      },
+      { header: 'Tipo de usuario', key: 'UserRoleName', width: 30 },
+    ];
+
+    //@ts-ignore
+    rows[0].map((row: any) => {
+      worksheet.addRow({
+        EquipmentTypeName: row.EquipmentTypeName,
+        EquipmentSerialNumber: row.EquipmentSerialNumber,
+        EquipmentDescription: row.EquipmentDescription,
+        EquipmentCode: row.EquipmentCode,
+        EquipmentLoanLendDateTime: row.EquipmentLoanLendDateTime,
+        EquipmentDateReturn: row.EquipmentDateReturn,
+        UserFirstName: row.UserFirstName,
+        UserFatherLastName: row.UserFatherLastName,
+        UserMotherLastName: row.UserMotherLastName,
+        UserInstitutionalCode: row.UserInstitutionalCode,
+        UserRoleName: row.UserRoleName,
+      });
+    });
+
+    const directory = await selectDirectory();
+    if (directory) {
+      await workbook.xlsx.writeFile(
+        directory +
+          '/Reporte de equipos prestados-' +
+          dayjs(new Date()).format('DD MMM, YYYY').toString() +
+          '.xlsx'
+      );
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+);
+
+ipcMain.handle(
+  'generate_Equipment_Loans_Report',
+  async (event, StartDate, EndDate) => {
+    const rows = await getEquipmentLoans(StartDate, EndDate);
+
+    const workbook = new Excel.Workbook();
+    const worksheet = workbook.addWorksheet('Reporte de suministros prestados');
+
+    worksheet.columns = [
+      { header: 'Equipo', key: 'EquipmentTypeName', width: 30 },
+      { header: 'Numero de serie', key: 'EquipmentSerialNumber', width: 30 },
+      { header: 'Descripción', key: 'EquipmentDescription', width: 30 },
+      { header: 'Código de equipo', key: 'EquipmentCode', width: 30 },
+      {
+        header: 'Fecha de préstamo',
+        key: 'EquipmentLoanLendDateTime',
+        width: 30,
+      },
+      { header: 'Fecha de retorno', key: 'EquipmentDateReturn', width: 30 },
+      { header: 'Solicitante', key: 'UserFirstName', width: 30 },
+      { header: 'Apellido paterno', key: 'UserFatherLastName', width: 30 },
+      { header: 'Apellido materno', key: 'UserMotherLastName', width: 30 },
+      {
+        header: 'Código institucional',
+        key: 'UserInstitutionalCode',
+        width: 30,
+      },
+      { header: 'Tipo de usuario', key: 'UserRoleName', width: 30 },
+    ];
+
+    //@ts-ignore
+    rows[0].map((row: any) => {
+      worksheet.addRow({
+        EquipmentTypeName: row.EquipmentTypeName,
+        EquipmentSerialNumber: row.EquipmentSerialNumber,
+        EquipmentDescription: row.EquipmentDescription,
+        EquipmentCode: row.EquipmentCode,
+        EquipmentLoanLendDateTime: row.EquipmentLoanLendDateTime,
+        EquipmentDateReturn: row.EquipmentDateReturn,
+        UserFirstName: row.UserFirstName,
+        UserFatherLastName: row.UserFatherLastName,
+        UserMotherLastName: row.UserMotherLastName,
+        UserInstitutionalCode: row.UserInstitutionalCode,
+        UserRoleName: row.UserRoleName,
+      });
+    });
+
+    const directory = await selectDirectory();
+    if (directory) {
+      await workbook.xlsx.writeFile(
+        directory +
+          '/Reporte de suministros prestados-' +
+          dayjs(new Date()).format('DD MMM, YYYY').toString() +
+          '.xlsx'
+      );
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+);
+
+ipcMain.handle('generate_inventory_equipment_report', async () => {
+  const rows = await getAllGeneralEquipmentReport();
+  console.log('🚀 ~ file: main.ts ~ line 555 ~ rows', rows[0]);
+
+  const workbook = new Excel.Workbook();
+  const worksheet = workbook.addWorksheet('Reporte de equipos prestados');
+
+  worksheet.columns = [
+    { header: 'Código institucional', key: 'code', width: 30 },
+    { header: 'Nombre', key: 'name', width: 30 },
+    { header: 'Apellido paterno', key: 'FatherL', width: 30 },
+    { header: 'Apellido materno', key: 'MotherL', width: 30 },
+    { header: 'Código de equipo', key: 'equipmentCode', width: 30 },
+    { header: 'Equipo', key: 'equipment', width: 30 },
+    { header: 'Fecha de préstamo', key: 'EquipmentLoan', width: 30 },
+    { header: 'Comentarios de préstamo', key: 'loanDescrip', width: 30 },
+  ];
+
+  //@ts-ignore
+  rows[0].map((row: any) => {
+    worksheet.addRow({
+      code: row.UserInstitutionalCode,
+      name: row.UserFirstName,
+      FatherL: row.UserFatherLastname,
+      MotherL: row.UserMotherLastname,
+      equipmentCode: row.EquipmentCode,
+      equipment: row.EquipmentTypeName,
+      EquipmentLoan: row.EquipmentLoanDateBorrow,
+      loanDescrip: row.LoanDescription,
+    });
+  });
+
+  const directory = await selectDirectory();
+  if (directory) {
+    await workbook.xlsx.writeFile(
+      directory +
+        '/Reporte de equipos-' +
+        dayjs(new Date()).format('DD MMM, YYYY').toString() +
+        '.xlsx'
+    );
+    return 1;
+  } else {
+    return 0;
+  }
+});
+
+ipcMain.handle('generate_use_equipment_report', async () => {
+  const rows = await getUseEquipmentLoansReport();
+  console.log('🚀 ~ file: main.ts ~ line 555 ~ rows', rows[0]);
+
+  const workbook = new Excel.Workbook();
+  const worksheet = workbook.addWorksheet('Reporte de equipos prestados');
+
+  worksheet.columns = [
+    { header: 'Código institucional', key: 'code', width: 30 },
+    { header: 'Nombre', key: 'name', width: 30 },
+    { header: 'Apellido paterno', key: 'FatherL', width: 30 },
+    { header: 'Apellido materno', key: 'MotherL', width: 30 },
+    { header: 'Código de equipo', key: 'equipmentCode', width: 30 },
+    { header: 'Equipo', key: 'equipment', width: 30 },
+    { header: 'Fecha de préstamo', key: 'EquipmentLoan', width: 30 },
+    { header: 'Comentarios de préstamo', key: 'loanDescrip', width: 30 },
+  ];
+
+  //@ts-ignore
+  rows[0].map((row: any) => {
+    worksheet.addRow({
+      code: row.UserInstitutionalCode,
+      name: row.UserFirstName,
+      FatherL: row.UserFatherLastname,
+      MotherL: row.UserMotherLastname,
+      equipmentCode: row.EquipmentCode,
+      equipment: row.EquipmentTypeName,
+      EquipmentLoan: row.EquipmentLoanDateBorrow,
+      loanDescrip: row.LoanDescription,
+    });
+  });
+
+  const directory = await selectDirectory();
+  if (directory) {
+    await workbook.xlsx.writeFile(
+      directory +
+        '/Reporte de equipos-' +
+        dayjs(new Date()).format('DD MMM, YYYY').toString() +
+        '.xlsx'
+    );
+    return 1;
+  } else {
+    return 0;
+  }
+});
+
+ipcMain.handle('generate_inventory_maintenance_equipment_report', async () => {
+  const rows = await getAllMaintenanceEquipmentReport();
+  console.log('🚀 ~ file: main.ts ~ line 555 ~ rows', rows[0]);
+
+  const workbook = new Excel.Workbook();
+  const worksheet = workbook.addWorksheet('Reporte de equipos prestados');
+
+  worksheet.columns = [
+    { header: 'Código institucional', key: 'code', width: 30 },
+    { header: 'Nombre', key: 'name', width: 30 },
+    { header: 'Apellido paterno', key: 'FatherL', width: 30 },
+    { header: 'Apellido materno', key: 'MotherL', width: 30 },
+    { header: 'Código de equipo', key: 'equipmentCode', width: 30 },
+    { header: 'Equipo', key: 'equipment', width: 30 },
+    { header: 'Fecha de préstamo', key: 'EquipmentLoan', width: 30 },
+    { header: 'Comentarios de préstamo', key: 'loanDescrip', width: 30 },
+  ];
+
+  //@ts-ignore
+  rows[0].map((row: any) => {
+    worksheet.addRow({
+      code: row.UserInstitutionalCode,
+      name: row.UserFirstName,
+      FatherL: row.UserFatherLastname,
+      MotherL: row.UserMotherLastname,
+      equipmentCode: row.EquipmentCode,
+      equipment: row.EquipmentTypeName,
+      EquipmentLoan: row.EquipmentLoanDateBorrow,
+      loanDescrip: row.LoanDescription,
+    });
+  });
+
+  const directory = await selectDirectory();
+  if (directory) {
+    await workbook.xlsx.writeFile(
+      directory +
+        '/Reporte de equipos-' +
+        dayjs(new Date()).format('DD MMM, YYYY').toString() +
+        '.xlsx'
+    );
+    return 1;
+  } else {
+    return 0;
+  }
+});
+
+ipcMain.handle('generate_in_maintenance_equipment_report', async () => {
+  const rows = await getInMaintenanceEquipmentReport();
+  console.log('🚀 ~ file: main.ts ~ line 555 ~ rows', rows[0]);
+
+  const workbook = new Excel.Workbook();
+  const worksheet = workbook.addWorksheet('Reporte de equipos prestados');
+
+  worksheet.columns = [
+    { header: 'Código institucional', key: 'code', width: 30 },
+    { header: 'Nombre', key: 'name', width: 30 },
+    { header: 'Apellido paterno', key: 'FatherL', width: 30 },
+    { header: 'Apellido materno', key: 'MotherL', width: 30 },
+    { header: 'Código de equipo', key: 'equipmentCode', width: 30 },
+    { header: 'Equipo', key: 'equipment', width: 30 },
+    { header: 'Fecha de préstamo', key: 'EquipmentLoan', width: 30 },
+    { header: 'Comentarios de préstamo', key: 'loanDescrip', width: 30 },
+  ];
+
+  //@ts-ignore
+  rows[0].map((row: any) => {
+    worksheet.addRow({
+      code: row.UserInstitutionalCode,
+      name: row.UserFirstName,
+      FatherL: row.UserFatherLastname,
+      MotherL: row.UserMotherLastname,
+      equipmentCode: row.EquipmentCode,
+      equipment: row.EquipmentTypeName,
+      EquipmentLoan: row.EquipmentLoanDateBorrow,
+      loanDescrip: row.LoanDescription,
+    });
+  });
+
+  const directory = await selectDirectory();
+  if (directory) {
+    await workbook.xlsx.writeFile(
+      directory +
+        '/Reporte de equipos-' +
+        dayjs(new Date()).format('DD MMM, YYYY').toString() +
+        '.xlsx'
+    );
+    return 1;
+  } else {
+    return 0;
+  }
+});
+
+ipcMain.handle('generate_use_maintenance_equipment_report', async () => {
+  const rows = await getUseMaintenanceEquipmentLoansReport();
+  console.log('🚀 ~ file: main.ts ~ line 555 ~ rows', rows[0]);
+
+  const workbook = new Excel.Workbook();
+  const worksheet = workbook.addWorksheet('Reporte de equipos prestados');
+
+  worksheet.columns = [
+    { header: 'Código institucional', key: 'code', width: 30 },
+    { header: 'Nombre', key: 'name', width: 30 },
+    { header: 'Apellido paterno', key: 'FatherL', width: 30 },
+    { header: 'Apellido materno', key: 'MotherL', width: 30 },
+    { header: 'Código de equipo', key: 'equipmentCode', width: 30 },
+    { header: 'Equipo', key: 'equipment', width: 30 },
+    { header: 'Fecha de préstamo', key: 'EquipmentLoan', width: 30 },
+    { header: 'Comentarios de préstamo', key: 'loanDescrip', width: 30 },
+  ];
+
+  //@ts-ignore
+  rows[0].map((row: any) => {
+    worksheet.addRow({
+      code: row.UserInstitutionalCode,
+      name: row.UserFirstName,
+      FatherL: row.UserFatherLastname,
+      MotherL: row.UserMotherLastname,
+      equipmentCode: row.EquipmentCode,
+      equipment: row.EquipmentTypeName,
+      EquipmentLoan: row.EquipmentLoanDateBorrow,
+      loanDescrip: row.LoanDescription,
+    });
+  });
+
+  const directory = await selectDirectory();
+  if (directory) {
+    await workbook.xlsx.writeFile(
+      directory +
+        '/Reporte de equipos-' +
+        dayjs(new Date()).format('DD MMM, YYYY').toString() +
+        '.xlsx'
+    );
+    return 1;
+  } else {
+    return 0;
+  }
+});
+
+ipcMain.handle(
+  'generate_Next_maintenance_equipment_report',
+  async (event, StartDate, EndDate) => {
+    const rows = await getNextMaintenanceEquipment(StartDate, EndDate);
+    console.log('🚀 ~ file: main.ts ~ line 555 ~ rows', rows[0]);
+
+    const workbook = new Excel.Workbook();
+    const worksheet = workbook.addWorksheet('Reporte de equipos prestados');
+
+    worksheet.columns = [
+      { header: 'Código institucional', key: 'code', width: 30 },
+      { header: 'Nombre', key: 'name', width: 30 },
+      { header: 'Apellido paterno', key: 'FatherL', width: 30 },
+      { header: 'Apellido materno', key: 'MotherL', width: 30 },
+      { header: 'Código de equipo', key: 'equipmentCode', width: 30 },
+      { header: 'Equipo', key: 'equipment', width: 30 },
+      { header: 'Fecha de préstamo', key: 'EquipmentLoan', width: 30 },
+      { header: 'Comentarios de préstamo', key: 'loanDescrip', width: 30 },
+    ];
+
+    //@ts-ignore
+    rows[0].map((row: any) => {
+      worksheet.addRow({
+        code: row.UserInstitutionalCode,
+        name: row.UserFirstName,
+        FatherL: row.UserFatherLastname,
+        MotherL: row.UserMotherLastname,
+        equipmentCode: row.EquipmentCode,
+        equipment: row.EquipmentTypeName,
+        EquipmentLoan: row.EquipmentLoanDateBorrow,
+        loanDescrip: row.LoanDescription,
+      });
+    });
+
+    const directory = await selectDirectory();
+    if (directory) {
+      await workbook.xlsx.writeFile(
+        directory +
+          '/Reporte de equipos-' +
+          dayjs(new Date()).format('DD MMM, YYYY').toString() +
+          '.xlsx'
+      );
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+);
 
 const selectDirectory = async () => {
   if (mainWindow) {
@@ -427,8 +960,3 @@ const selectDirectory = async () => {
     return directory.filePaths[0];
   }
 };
-
-ipcMain.handle('get_Quantity_students', async () => {
-  const result = await getQuantityOfUsers();
-  return result;
-});

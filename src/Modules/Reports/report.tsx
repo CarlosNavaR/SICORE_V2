@@ -11,6 +11,9 @@ import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import { toast } from 'react-toastify';
 import ChartUser from './ModulesReports/ChartUsers';
+import ChartLoans from './ModulesReports/ChartLoans';
+import ChartEquipment from './ModulesReports/ChartEquipment';
+import ChartMaintenanceEquipment from './ModulesReports/ChartMaintenanceEquipment';
 
 const Report = () => {
   const [report, setReport] = useState('1');
@@ -41,7 +44,17 @@ const Report = () => {
       </Paper>
 
       <Paper style={{ padding: '1rem', marginTop: '1.5rem' }}>
-        {report === '1' ? <ChartUser /> : ''}
+        {report === '1' ? (
+          <ChartLoans />
+        ) : report === '2' ? (
+          <ChartEquipment />
+        ) : report === '3' ? (
+          <ChartMaintenanceEquipment />
+        ) : report === '4' ? (
+          <ChartUser />
+        ) : (
+          ''
+        )}
       </Paper>
     </div>
   );
