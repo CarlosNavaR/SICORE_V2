@@ -7,6 +7,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import { toast } from 'react-toastify';
 import Paper from '@mui/material/Paper';
 
 function createData(
@@ -29,10 +30,6 @@ const ChartEquipment = () => {
 
   const handleData = async () => {
     const result = await window.Main.getQtyEquipments();
-    console.log(
-      '🚀 ~ file: ChartUsers.tsx ~ line 28 ~ handleData ~ result',
-      result
-    );
     const chartRow = [result[0].ActiveEquipments, result[0].InactiveEquipments];
     setRows([
       createData(
@@ -49,6 +46,23 @@ const ChartEquipment = () => {
   useEffect(() => {
     handleData();
   }, []);
+
+  const handleInventoryReport = async () => {
+    const result = await window.Main.generateInventoryEquipment();
+    if (result === 1) {
+      toast.success('Reporte generado con éxito');
+    } else {
+      toast.error('Ocurrió un error al generar el reporte');
+    }
+  };
+  const handleUseEquipmentReport = async () => {
+    const result = await window.Main.generateUseEquipment();
+    if (result === 1) {
+      toast.success('Reporte generado con éxito');
+    } else {
+      toast.error('Ocurrió un error al generar el reporte');
+    }
+  };
 
   return (
     <Grid container justifyContent="center">
@@ -85,11 +99,21 @@ const ChartEquipment = () => {
           </Table>
         </TableContainer>
 
-        <button className="btn btn-outline-dark mt-3 me-3" onClick={() => {}}>
+        <button
+          className="btn btn-outline-dark mt-3 me-3"
+          onClick={() => {
+            handleInventoryReport();
+          }}
+        >
           Reporte de inventario
         </button>
 
-        <button className="btn btn-outline-dark mt-3 me-3" onClick={() => {}}>
+        <button
+          className="btn btn-outline-dark mt-3 me-3"
+          onClick={() => {
+            handleUseEquipmentReport();
+          }}
+        >
           Reporte de uso
         </button>
       </Grid>

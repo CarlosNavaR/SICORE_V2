@@ -674,33 +674,32 @@ ipcMain.handle(
 
 ipcMain.handle('generate_inventory_equipment_report', async () => {
   const rows = await getAllGeneralEquipmentReport();
-  console.log('🚀 ~ file: main.ts ~ line 555 ~ rows', rows[0]);
 
   const workbook = new Excel.Workbook();
-  const worksheet = workbook.addWorksheet('Reporte de equipos prestados');
+  const worksheet = workbook.addWorksheet('Reporte de equipos');
 
   worksheet.columns = [
-    { header: 'Código institucional', key: 'code', width: 30 },
-    { header: 'Nombre', key: 'name', width: 30 },
-    { header: 'Apellido paterno', key: 'FatherL', width: 30 },
-    { header: 'Apellido materno', key: 'MotherL', width: 30 },
-    { header: 'Código de equipo', key: 'equipmentCode', width: 30 },
-    { header: 'Equipo', key: 'equipment', width: 30 },
-    { header: 'Fecha de préstamo', key: 'EquipmentLoan', width: 30 },
-    { header: 'Comentarios de préstamo', key: 'loanDescrip', width: 30 },
+    { header: 'Ubicación', key: 'Location', width: 30 },
+    { header: 'Código', key: 'EquipmentCode', width: 30 },
+    { header: 'Numero de serie', key: 'EquipmentSerialNumber', width: 30 },
+    { header: 'Descripción', key: 'EquipmentDescription', width: 30 },
+    { header: 'Tipo de equipo', key: 'EquipmentTypeName', width: 30 },
+    {
+      header: 'Estado de equipo',
+      key: 'EquipmentQualityStatusName',
+      width: 30,
+    },
   ];
 
   //@ts-ignore
-  rows[0].map((row: any) => {
+  rows.map((row: any) => {
     worksheet.addRow({
-      code: row.UserInstitutionalCode,
-      name: row.UserFirstName,
-      FatherL: row.UserFatherLastname,
-      MotherL: row.UserMotherLastname,
-      equipmentCode: row.EquipmentCode,
-      equipment: row.EquipmentTypeName,
-      EquipmentLoan: row.EquipmentLoanDateBorrow,
-      loanDescrip: row.LoanDescription,
+      Location: row.Location,
+      EquipmentCode: row.EquipmentCode,
+      EquipmentSerialNumber: row.EquipmentSerialNumber,
+      EquipmentDescription: row.EquipmentDescription,
+      EquipmentTypeName: row.EquipmentTypeName,
+      EquipmentQualityStatusName: row.EquipmentQualityStatusName,
     });
   });
 
@@ -720,33 +719,26 @@ ipcMain.handle('generate_inventory_equipment_report', async () => {
 
 ipcMain.handle('generate_use_equipment_report', async () => {
   const rows = await getUseEquipmentLoansReport();
-  console.log('🚀 ~ file: main.ts ~ line 555 ~ rows', rows[0]);
 
   const workbook = new Excel.Workbook();
-  const worksheet = workbook.addWorksheet('Reporte de equipos prestados');
+  const worksheet = workbook.addWorksheet('Reporte de uso de equipos');
 
   worksheet.columns = [
-    { header: 'Código institucional', key: 'code', width: 30 },
-    { header: 'Nombre', key: 'name', width: 30 },
-    { header: 'Apellido paterno', key: 'FatherL', width: 30 },
-    { header: 'Apellido materno', key: 'MotherL', width: 30 },
-    { header: 'Código de equipo', key: 'equipmentCode', width: 30 },
-    { header: 'Equipo', key: 'equipment', width: 30 },
-    { header: 'Fecha de préstamo', key: 'EquipmentLoan', width: 30 },
-    { header: 'Comentarios de préstamo', key: 'loanDescrip', width: 30 },
+    { header: 'Numero de veces prestado', key: 'QuantityLoan', width: 30 },
+    { header: 'Tipo de equipo', key: 'EquipmentTypeName', width: 30 },
+    { header: 'Numero de serie', key: 'EquipmentSerialNumber', width: 30 },
+    { header: 'Descripción', key: 'EquipmentDescription', width: 30 },
+    { header: 'Código', key: 'EquipmentCode', width: 30 },
   ];
 
   //@ts-ignore
-  rows[0].map((row: any) => {
+  rows.map((row: any) => {
     worksheet.addRow({
-      code: row.UserInstitutionalCode,
-      name: row.UserFirstName,
-      FatherL: row.UserFatherLastname,
-      MotherL: row.UserMotherLastname,
-      equipmentCode: row.EquipmentCode,
-      equipment: row.EquipmentTypeName,
-      EquipmentLoan: row.EquipmentLoanDateBorrow,
-      loanDescrip: row.LoanDescription,
+      QuantityLoan: row.QuantityLoan,
+      EquipmentTypeName: row.EquipmentTypeName,
+      EquipmentSerialNumber: row.EquipmentSerialNumber,
+      EquipmentDescription: row.EquipmentDescription,
+      EquipmentCode: row.EquipmentCode,
     });
   });
 
@@ -754,7 +746,7 @@ ipcMain.handle('generate_use_equipment_report', async () => {
   if (directory) {
     await workbook.xlsx.writeFile(
       directory +
-        '/Reporte de equipos-' +
+        '/Reporte de uso de equipos-' +
         dayjs(new Date()).format('DD MMM, YYYY').toString() +
         '.xlsx'
     );
@@ -766,33 +758,44 @@ ipcMain.handle('generate_use_equipment_report', async () => {
 
 ipcMain.handle('generate_inventory_maintenance_equipment_report', async () => {
   const rows = await getAllMaintenanceEquipmentReport();
-  console.log('🚀 ~ file: main.ts ~ line 555 ~ rows', rows[0]);
 
   const workbook = new Excel.Workbook();
-  const worksheet = workbook.addWorksheet('Reporte de equipos prestados');
+  const worksheet = workbook.addWorksheet('Reporte de equipos');
 
   worksheet.columns = [
-    { header: 'Código institucional', key: 'code', width: 30 },
-    { header: 'Nombre', key: 'name', width: 30 },
-    { header: 'Apellido paterno', key: 'FatherL', width: 30 },
-    { header: 'Apellido materno', key: 'MotherL', width: 30 },
-    { header: 'Código de equipo', key: 'equipmentCode', width: 30 },
-    { header: 'Equipo', key: 'equipment', width: 30 },
-    { header: 'Fecha de préstamo', key: 'EquipmentLoan', width: 30 },
-    { header: 'Comentarios de préstamo', key: 'loanDescrip', width: 30 },
+    { header: 'Ubicación', key: 'Location', width: 30 },
+    { header: 'Código', key: 'EquipmentCode', width: 30 },
+    { header: 'Numero de serie', key: 'EquipmentSerialNumber', width: 30 },
+    { header: 'Descripción', key: 'EquipmentDescription', width: 30 },
+    { header: 'Tipo de equipo', key: 'EquipmentTypeName', width: 30 },
+    {
+      header: 'Estado de equipo',
+      key: 'EquipmentQualityStatusName',
+      width: 30,
+    },
+    {
+      header: 'Ultimo mantenimiento',
+      key: 'UltimoMant',
+      width: 30,
+    },
+    {
+      header: 'Proximo mantenimiento',
+      key: 'ProximoMant',
+      width: 30,
+    },
   ];
 
   //@ts-ignore
-  rows[0].map((row: any) => {
+  rows.map((row: any) => {
     worksheet.addRow({
-      code: row.UserInstitutionalCode,
-      name: row.UserFirstName,
-      FatherL: row.UserFatherLastname,
-      MotherL: row.UserMotherLastname,
-      equipmentCode: row.EquipmentCode,
-      equipment: row.EquipmentTypeName,
-      EquipmentLoan: row.EquipmentLoanDateBorrow,
-      loanDescrip: row.LoanDescription,
+      Location: row.Location,
+      EquipmentCode: row.EquipmentCode,
+      EquipmentSerialNumber: row.EquipmentSerialNumber,
+      EquipmentDescription: row.EquipmentDescription,
+      EquipmentTypeName: row.EquipmentTypeName,
+      EquipmentQualityStatusName: row.EquipmentQualityStatusName,
+      UltimoMant: row.UltimoMant,
+      ProximoMant: row.ProximoMant,
     });
   });
 
@@ -800,7 +803,7 @@ ipcMain.handle('generate_inventory_maintenance_equipment_report', async () => {
   if (directory) {
     await workbook.xlsx.writeFile(
       directory +
-        '/Reporte de equipos-' +
+        '/Reporte de inventario de equipos (Mantenimiento)-' +
         dayjs(new Date()).format('DD MMM, YYYY').toString() +
         '.xlsx'
     );
@@ -812,33 +815,34 @@ ipcMain.handle('generate_inventory_maintenance_equipment_report', async () => {
 
 ipcMain.handle('generate_in_maintenance_equipment_report', async () => {
   const rows = await getInMaintenanceEquipmentReport();
-  console.log('🚀 ~ file: main.ts ~ line 555 ~ rows', rows[0]);
 
   const workbook = new Excel.Workbook();
-  const worksheet = workbook.addWorksheet('Reporte de equipos prestados');
+  const worksheet = workbook.addWorksheet(
+    'Reporte de equipos en mantenimiento'
+  );
 
   worksheet.columns = [
-    { header: 'Código institucional', key: 'code', width: 30 },
-    { header: 'Nombre', key: 'name', width: 30 },
-    { header: 'Apellido paterno', key: 'FatherL', width: 30 },
-    { header: 'Apellido materno', key: 'MotherL', width: 30 },
-    { header: 'Código de equipo', key: 'equipmentCode', width: 30 },
-    { header: 'Equipo', key: 'equipment', width: 30 },
-    { header: 'Fecha de préstamo', key: 'EquipmentLoan', width: 30 },
-    { header: 'Comentarios de préstamo', key: 'loanDescrip', width: 30 },
+    { header: 'Ubicación', key: 'Location', width: 30 },
+    { header: 'Tipo de equipo', key: 'EquipmentTypeName', width: 30 },
+    { header: 'Numero de serie', key: 'EquipmentSerialNumber', width: 30 },
+    { header: 'Descripción', key: 'EquipmentDescription', width: 30 },
+    { header: 'Código', key: 'EquipmentCode', width: 30 },
+    {
+      header: 'Proximo mantenimiento',
+      key: 'ProximoMant',
+      width: 30,
+    },
   ];
 
   //@ts-ignore
-  rows[0].map((row: any) => {
+  rows.map((row: any) => {
     worksheet.addRow({
-      code: row.UserInstitutionalCode,
-      name: row.UserFirstName,
-      FatherL: row.UserFatherLastname,
-      MotherL: row.UserMotherLastname,
-      equipmentCode: row.EquipmentCode,
-      equipment: row.EquipmentTypeName,
-      EquipmentLoan: row.EquipmentLoanDateBorrow,
-      loanDescrip: row.LoanDescription,
+      Location: row.Location,
+      EquipmentTypeName: row.EquipmentTypeName,
+      EquipmentSerialNumber: row.EquipmentSerialNumber,
+      EquipmentDescription: row.EquipmentDescription,
+      EquipmentCode: row.EquipmentCode,
+      ProximoMant: row.ProximoMant,
     });
   });
 
@@ -846,7 +850,7 @@ ipcMain.handle('generate_in_maintenance_equipment_report', async () => {
   if (directory) {
     await workbook.xlsx.writeFile(
       directory +
-        '/Reporte de equipos-' +
+        '/Reporte de equipos en mantenimiento-' +
         dayjs(new Date()).format('DD MMM, YYYY').toString() +
         '.xlsx'
     );
@@ -858,33 +862,40 @@ ipcMain.handle('generate_in_maintenance_equipment_report', async () => {
 
 ipcMain.handle('generate_use_maintenance_equipment_report', async () => {
   const rows = await getUseMaintenanceEquipmentLoansReport();
-  console.log('🚀 ~ file: main.ts ~ line 555 ~ rows', rows[0]);
 
   const workbook = new Excel.Workbook();
-  const worksheet = workbook.addWorksheet('Reporte de equipos prestados');
+  const worksheet = workbook.addWorksheet(
+    'Reporte de uso de equipos (Mantenimiento)'
+  );
 
   worksheet.columns = [
-    { header: 'Código institucional', key: 'code', width: 30 },
-    { header: 'Nombre', key: 'name', width: 30 },
-    { header: 'Apellido paterno', key: 'FatherL', width: 30 },
-    { header: 'Apellido materno', key: 'MotherL', width: 30 },
-    { header: 'Código de equipo', key: 'equipmentCode', width: 30 },
-    { header: 'Equipo', key: 'equipment', width: 30 },
-    { header: 'Fecha de préstamo', key: 'EquipmentLoan', width: 30 },
-    { header: 'Comentarios de préstamo', key: 'loanDescrip', width: 30 },
+    { header: 'Numero de veces prestado', key: 'QuantityLoan', width: 30 },
+    { header: 'Tipo de equipo', key: 'EquipmentTypeName', width: 30 },
+    { header: 'Numero de serie', key: 'EquipmentSerialNumber', width: 30 },
+    { header: 'Descripción', key: 'EquipmentDescription', width: 30 },
+    { header: 'Código', key: 'EquipmentCode', width: 30 },
+    {
+      header: 'Ultimo mantenimiento',
+      key: 'UltimoMant',
+      width: 30,
+    },
+    {
+      header: 'Proximo mantenimiento',
+      key: 'ProximoMant',
+      width: 30,
+    },
   ];
 
   //@ts-ignore
-  rows[0].map((row: any) => {
+  rows.map((row: any) => {
     worksheet.addRow({
-      code: row.UserInstitutionalCode,
-      name: row.UserFirstName,
-      FatherL: row.UserFatherLastname,
-      MotherL: row.UserMotherLastname,
-      equipmentCode: row.EquipmentCode,
-      equipment: row.EquipmentTypeName,
-      EquipmentLoan: row.EquipmentLoanDateBorrow,
-      loanDescrip: row.LoanDescription,
+      QuantityLoan: row.QuantityLoan,
+      EquipmentTypeName: row.EquipmentTypeName,
+      EquipmentSerialNumber: row.EquipmentSerialNumber,
+      EquipmentDescription: row.EquipmentDescription,
+      EquipmentCode: row.EquipmentCode,
+      UltimoMant: row.UltimoMant,
+      ProximoMant: row.ProximoMant,
     });
   });
 
@@ -892,7 +903,7 @@ ipcMain.handle('generate_use_maintenance_equipment_report', async () => {
   if (directory) {
     await workbook.xlsx.writeFile(
       directory +
-        '/Reporte de equipos-' +
+        '/Reporte de uso de equipos (Mantenimiento)-' +
         dayjs(new Date()).format('DD MMM, YYYY').toString() +
         '.xlsx'
     );
@@ -906,33 +917,44 @@ ipcMain.handle(
   'generate_Next_maintenance_equipment_report',
   async (event, StartDate, EndDate) => {
     const rows = await getNextMaintenanceEquipment(StartDate, EndDate);
-    console.log('🚀 ~ file: main.ts ~ line 555 ~ rows', rows[0]);
 
     const workbook = new Excel.Workbook();
-    const worksheet = workbook.addWorksheet('Reporte de equipos prestados');
+    const worksheet = workbook.addWorksheet('Reporte de mantenimiento');
 
     worksheet.columns = [
-      { header: 'Código institucional', key: 'code', width: 30 },
-      { header: 'Nombre', key: 'name', width: 30 },
-      { header: 'Apellido paterno', key: 'FatherL', width: 30 },
-      { header: 'Apellido materno', key: 'MotherL', width: 30 },
-      { header: 'Código de equipo', key: 'equipmentCode', width: 30 },
-      { header: 'Equipo', key: 'equipment', width: 30 },
-      { header: 'Fecha de préstamo', key: 'EquipmentLoan', width: 30 },
-      { header: 'Comentarios de préstamo', key: 'loanDescrip', width: 30 },
+      { header: 'Ubicación', key: 'Location', width: 30 },
+      { header: 'Código', key: 'EquipmentCode', width: 30 },
+      { header: 'Numero de serie', key: 'EquipmentSerialNumber', width: 30 },
+      { header: 'Descripción', key: 'EquipmentDescription', width: 30 },
+      { header: 'Tipo de equipo', key: 'EquipmentTypeName', width: 30 },
+      {
+        header: 'Estado de equipo',
+        key: 'EquipmentQualityStatusName',
+        width: 30,
+      },
+      {
+        header: 'Ultimo mantenimiento',
+        key: 'UltimoMant',
+        width: 30,
+      },
+      {
+        header: 'Proximo mantenimiento',
+        key: 'ProximoMant',
+        width: 30,
+      },
     ];
 
     //@ts-ignore
     rows[0].map((row: any) => {
       worksheet.addRow({
-        code: row.UserInstitutionalCode,
-        name: row.UserFirstName,
-        FatherL: row.UserFatherLastname,
-        MotherL: row.UserMotherLastname,
-        equipmentCode: row.EquipmentCode,
-        equipment: row.EquipmentTypeName,
-        EquipmentLoan: row.EquipmentLoanDateBorrow,
-        loanDescrip: row.LoanDescription,
+        Location: row.Location,
+        EquipmentCode: row.EquipmentCode,
+        EquipmentSerialNumber: row.EquipmentSerialNumber,
+        EquipmentDescription: row.EquipmentDescription,
+        EquipmentTypeName: row.EquipmentTypeName,
+        EquipmentQualityStatusName: row.EquipmentQualityStatusName,
+        UltimoMant: row.UltimoMant,
+        ProximoMant: row.ProximoMant,
       });
     });
 
@@ -940,7 +962,7 @@ ipcMain.handle(
     if (directory) {
       await workbook.xlsx.writeFile(
         directory +
-          '/Reporte de equipos-' +
+          '/Reporte de proximo mantenimiento-' +
           dayjs(new Date()).format('DD MMM, YYYY').toString() +
           '.xlsx'
       );
