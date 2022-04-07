@@ -9,6 +9,7 @@ import { EquipmentQualityStatusModel } from '../models/equipmentQualityStatus';
 import { EquipmentModel } from '../models/EquipmentModel';
 import { displayEquipmentLoanModel } from '../models/displayEquipmentLoanModel';
 import { displayReportsModel } from '../models/displayReportsModel';
+import { displayEmailModel } from '../models/emailModel';
 const connection = db.dbConnection();
 
 export const registerNewSystemActivity = async (
@@ -597,6 +598,20 @@ export const getLoanDetails = async (
   const [result, fields] = await (
     await connection
   ).query<EquipmentModel & RowDataPacket[][]>(sqlQuery, [IdUser, IdLoan]);
+
+  return result;
+};
+
+export const getLoanDetailsReport = async (
+  IdUser: any,
+  IdLoan: any
+): Promise<displayEmailModel> => {
+  const sqlQuery =
+    'SELECT `equipmentloandetail`.`DateReturn`,`equipmentloan`.`Description` as `Comentarios`, `equipment`.`Id`, `EquipmentType`.`Name` `EquipmentTypeName`,`equipment`.`Description`, `Code`, `Location`,`EquipmentQualityStatus`.`Name` `EquipmentQualityStatusName` FROM equipment INNER JOIN `EquipmentType` ON`Equipment`.`IdEquipmentType` =`EquipmentType`.`Id` INNER JOIN `EquipmentQualityStatus` ON `Equipment`.`IdEquipmentQualityStatus` =`EquipmentQualityStatus`.`Id` INNER JOIN equipmentloandetail ON equipment.Id = equipmentloandetail.IdEquipment INNER JOIN equipmentloan ON equipmentloandetail.IdEquipmentLoan = equipmentloan.Id WHERE equipmentloandetail.IsActive =0 and equipmentloan.isActive =0 and equipmentloan.IdUser = ? and equipmentloan.Id =?;';
+
+  const [result, fields] = await (
+    await connection
+  ).query<displayEmailModel & RowDataPacket[][]>(sqlQuery, [IdUser, IdLoan]);
 
   return result;
 };

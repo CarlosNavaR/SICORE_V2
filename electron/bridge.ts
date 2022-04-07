@@ -231,13 +231,15 @@ export const api = {
   deactivateFullEquipmentLoan: (
     IdLoan: any,
     Description: any,
-    IdSystemUser: any
+    IdSystemUser: any,
+    IdInstitutionalCodeLoan: any
   ) => {
     const result = ipcRenderer.invoke(
       'deactivate_full_equipment_loan',
       IdLoan,
       Description,
-      IdSystemUser
+      IdSystemUser,
+      IdInstitutionalCodeLoan
     );
     return result;
   },

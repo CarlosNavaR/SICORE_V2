@@ -12,7 +12,7 @@ export class db {
   }
   private static async createConnection() {
     this.connection = await mySql.createPool({
-      host: 'localhost',
+      host: '192.168.151.10',
       port: 3306,
       user: 'sicore_app',
       password: 'sicore_app',

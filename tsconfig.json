@@ -15,7 +15,8 @@
       "_public/*": ["public/*"],
       "_models/*": ["src/models/*"],
       "_electron/*": ["electron/*"],
-      "_services/*": ["src/Services/*"]
+      "_services/*": ["src/Services/*"],
+      "nodemailer_react": ["../src"]
     }
   }
 }

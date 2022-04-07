@@ -28,6 +28,7 @@
     "exceljs": "^4.3.0",
     "mysql2": "^2.3.3",
     "nodemailer": "^6.7.3",
+    "nodemailer-react": "^1.0.2",
     "qrcode": "^1.5.0",
     "react": "17.0.2",
     "react-chartjs-2": "^4.0.1",

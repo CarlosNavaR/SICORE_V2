@@ -3,8 +3,13 @@ const path = require('path');
 const fs = require('fs');
 const Excel = require('exceljs');
 const nodemailer = require('nodemailer');
+import { Mailer } from 'nodemailer-react';
 const QRCode = require('qrcode');
 const dotenv = require('dotenv').config();
+const { ReportEmail } = require('./Mail');
+import dayjs from 'dayjs';
+import 'dayjs/locale/es';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import {
   login,
   getAllUsers,
@@ -49,10 +54,10 @@ import {
   getQuantityEquipments,
   getQuantityMaintenanceEquipments,
   getAllTeachersUsers,
+  getUserByInstitutionalCode,
+  getLoanDetailsReport,
 } from '../src/Services/sqlDataService';
-import dayjs from 'dayjs';
-import 'dayjs/locale/es';
-import relativeTime from 'dayjs/plugin/relativeTime';
+
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
 let mainWindow: BrowserWindow | null;
@@ -295,26 +300,76 @@ ipcMain.handle('Get_Loan_Details', async (event, Iduser, IdLoan) => {
   return result;
 });
 
-function SendIt() {
-  var transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL_KEY,
-      pass: process.env.EMAIL_PASS_KEY,
+async function SendIt(User: any, IdLoan: any) {
+  const resultReport = await getLoanDetailsReport(User.Id, IdLoan);
+  const mailerConfig = {
+    defaults: {
+      from: {
+        name: 'Caseta de Ingeniería Industrial',
+        address: process.env.EMAIL_KEY,
+      },
     },
-  });
-
-  const mailOptions = {
-    from: process.env.EMAIL_KEY,
-    to: 'carlos.nava17@tectijuana.edu.mx',
-    subject: 'Subject of your email',
-    html: '<p>Your html here</p>',
+    transport: {
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      auth: {
+        type: 'OAuth2',
+        user: process.env.EMAIL_KEY,
+        pass: process.env.EMAIL_PASS_KEY,
+        clientId: process.env.OAUTH_CLIENTID,
+        clientSecret: process.env.OAUTH_CLIENT_SECRET,
+        refreshToken: process.env.OAUTH_REFRESH_TOKEN,
+      },
+    },
   };
 
-  transporter.sendMail(mailOptions, function (err: any, info: any) {
-    if (err) console.log(err);
-    else console.log(info);
-  });
+  const email = {
+    ReportEmail,
+  };
+  //@ts-ignore
+  const mailer = Mailer(mailerConfig, email);
+
+  await mailer.send(
+    'ReportEmail',
+    {
+      User: User,
+      Data: resultReport,
+    },
+    {
+      to: User.InstitutionalEmail,
+    }
+  );
+
+  // var transporter = nodemailer.createTransport({
+  //   service: 'gmail',
+  //   auth: {
+  //     type: 'OAuth2',
+  //     user: process.env.EMAIL_KEY,
+  //     pass: process.env.EMAIL_PASS_KEY,
+  //     clientId: process.env.OAUTH_CLIENTID,
+  //     clientSecret: process.env.OAUTH_CLIENT_SECRET,
+  //     refreshToken: process.env.OAUTH_REFRESH_TOKEN,
+  //   },
+  // });
+
+  // transporter.verify((err: any, success: any) => {
+  //   err
+  //     ? console.log(err)
+  //     : console.log(`=== Server is ready to take messages: ${success} ===`);
+  // });
+
+  // const mailOptions = {
+  //   from: process.env.EMAIL_KEY,
+  //   to: InstitutionalEmail,
+  //   subject: 'Confirmación de devolución de préstamo',
+  //   html: '<p>a</p>',
+  // };
+
+  // transporter.sendMail(mailOptions, function (err: any, info: any) {
+  //   if (err) console.log(err);
+  //   else console.log(info);
+  // });
 }
 
 ipcMain.handle('generate_Code', async (event, data, IdSystemUser) => {
@@ -384,9 +439,14 @@ ipcMain.handle(
 
 ipcMain.handle(
   'deactivate_full_equipment_loan',
-  async (event, IdLoan, Description, IdSystemUser) => {
+  async (event, IdLoan, Description, IdSystemUser, IdInstitutionalCodeLoan) => {
     const result = await deactivateFullEquipmentLoan(IdLoan, Description);
-    //SendIt();
+    const user = await getUserByInstitutionalCode(IdInstitutionalCodeLoan);
+    //@ts-ignore
+    if (user[0].InstitutionalEmail) {
+      //@ts-ignore
+      SendIt(user[0], IdLoan);
+    }
     await registerNewSystemActivity(IdSystemUser, 4);
     return result;
   }

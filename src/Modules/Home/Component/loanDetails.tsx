@@ -16,12 +16,11 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import Grid from '@mui/material/Grid';
-import Logic from './loanDetails.logic';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { displayEquipmentLoanModel } from '../../../models/displayEquipmentLoanModel';
 import { displayEquipmentModel } from '../../../models/displayEquipmentModel';
+import Logic from './loanDetails.logic';
 import { AuthContext } from '../../../Context/authcontext';
-
 dayjs.extend(relativeTime).locale('es');
 
 const style = {
@@ -80,7 +79,8 @@ const LoanDetails = ({
     const result = await window.Main.deactivateFullEquipmentLoan(
       selectedLoan?.IdLoan,
       data.Description,
-      auth?.Id
+      auth?.Id,
+      selectedLoan?.InstitutionalCode
     );
 
     if (result === 1) {
