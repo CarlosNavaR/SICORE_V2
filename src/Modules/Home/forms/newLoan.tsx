@@ -107,6 +107,13 @@ const NewLoanForm = ({ handleClose, getAllEquipmentLoans }: Props) => {
                   {...register('InstitutionalCode', {
                     required: true,
                   })}
+                  onKeyPress={(
+                    e: React.KeyboardEvent<
+                      HTMLInputElement | HTMLTextAreaElement
+                    >
+                  ) => {
+                    e.key === 'Enter' && e.preventDefault();
+                  }}
                 />
               </div>
             </Grid>
@@ -125,6 +132,13 @@ const NewLoanForm = ({ handleClose, getAllEquipmentLoans }: Props) => {
                     type="text"
                     id="Code"
                     className="form-control form-control"
+                    onKeyPress={(
+                      e: React.KeyboardEvent<
+                        HTMLInputElement | HTMLTextAreaElement
+                      >
+                    ) => {
+                      e.key === 'Enter' && e.preventDefault();
+                    }}
                   />
                 </div>
               </Grid>
